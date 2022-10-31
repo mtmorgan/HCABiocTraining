@@ -1,0 +1,19 @@
+---
+title: "B. Accessing HCA Data from R / Bioconductor"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{B. Accessing HCA Data from R / Bioconductor}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(HCABiocTraining)
+```

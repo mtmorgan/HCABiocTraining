@@ -1,0 +1,170 @@
+---
+title: "A. Introduction to R"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{A. Introduction to R}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE
+)
+```
+
+# Essential _R_
+
+A simple calculator
+
+```{r}
+1 + 1
+```
+
+'Vectors' as building blocks
+
+```{r}
+c(1, 2, 3)
+c("January", "February", "March")
+c(TRUE, FALSE)
+```
+
+Variables, missing values and 'factors'
+
+```{r}
+age <- c(27, NA, 32, 29)
+gender <- factor(
+    c("Female", "Male", "Non-binary", NA),
+    levels = c("Female", "Male", "Non-binary")
+)
+```
+
+Data structures to coordinate related vectors -- the `data.frame`
+
+```{r}
+df <- data.frame(
+    age = c(27, NA, 32, 29),
+    gender = gender
+)
+df
+```
+
+Functions
+
+```{r}
+rnorm(5)        # 5 random normal deviates
+x <- rnorm(100) # 100 random normal deviates
+hist(x)         # histogram, approximately normal
+plot(density(x)) # a little more sophisticated?
+```
+
+'Vectorized' operations, e.g., element-wise addition without an
+explicit 'for' loop
+
+
+```{r}
+y <- x + rnorm(100)
+plot(y ~ x)
+fit <- lm(y ~ x)
+fit         # an R 'object' containing information about the
+            # regression of y on x
+abline(fit) # plot points and fitted regression line
+anova(fit)  # statistical summary of linear regression
+```
+
+Write your own functions
+
+```{r}
+hello <- function(who) {
+    paste("hello", who, "with", nchar(who), "letters in your name")
+}
+hello("Martin")
+```
+
+Iterate, usually with `lapply()` although `for()` is
+available
+
+```{r}
+names <- c("Martin", "Thomas")
+lapply(names, hello)
+```
+
+# Packages
+
+Extend functionality of base _R_. Can be part of the 'base' distribution...
+
+```{r}
+## iterate over the numbers 1 through 8, 'sleeping' for 1 second
+## each. Takes about 8 seconds...
+system.time({
+    lapply(1:8, function(i) Sys.sleep(1))
+})
+
+## sleep in parallel -- takes only 2 seconds
+library(parallel)
+cl <- makeCluster(4) # cluster of 4 workers
+system.time({
+    parLapply(cl, 1:8, function(i) Sys.sleep(1))
+})
+```
+
+...or contributed, e.g., [dplyr][] to introduce the 'tidyverse'
+
+```{r, message = FALSE}
+library(dplyr)
+```
+
+A 'tibble' is like a 'data.frame', but more user-friendly
+
+```{r}
+tbl <- tibble(
+    x = rnorm(100),
+    y = x + rnorm(100)
+)
+
+## e.g., only displays the first 10 rows
+tbl
+```
+
+The tidyverse makes use of 'pipes' `|>`. A pipe takes the left-hand
+side and pass through to the right-hand side. Key [dplyr][] 'verbs'
+can be piped together: `filter()` (rows), `select()` (columns),
+`mutate()` (change values), `group_by()` (operate on groups of rows)
+
+
+```{r}
+tbl |>
+    ## e.g., just rows with non-negative values of x and y
+    filter(x > 0, y > 0) |>
+    ## add a column
+    mutate(distance_from_origin = sqrt(x^2 + y^2))
+```
+
+
+Another example: [ggplot2][] for visualization
+
+```{r}
+library(ggplot2)
+ggplot(tbl) +
+    aes(x, y) +                # use 'x' and 'y' columns for plotting...
+    geom_point() +             # ...plot points...
+    geom_smooth(method = "lm") # ...linear regresion
+```
+
+[dplyr]: https://cran.r-project.org/package=dplyr
+[ggplot2]: https://cran.r-project.org/package=ggplot2
+
+# Help & Vignettes
+
+1. Help pages, e.g., `?lm`
+
+2. Vignettes, e.g., 
+
+    ```{r}
+    vignette(package = "ggplot2")
+    ```
+    ```{r, eval = FALSE}
+    vignette("ggplot2-specs", "ggplot2")
+    ```
+
+3. Google, StackOverflow, etc...
