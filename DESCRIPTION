@@ -1,0 +1,16 @@
+Package: HCABiocTraining
+Title: Introduction to Human Cell Atlas Data Access & Analysis in R / Bioconductor
+Version: 0.0.1
+Authors@R:
+    person(
+        "Martin", "Morgan",
+        email = "Martin.Morgan@RoswellPark.org",
+        role = c("aut", "cre"),
+        comment = c(ORCID = "0000-0002-5874-8148")
+    )
+Description: A brief but comprehensive introduction to Human Cell
+    Atlas data retrieval and analysis in R / Bioconductor.
+License: CC BY 4.0
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.1
