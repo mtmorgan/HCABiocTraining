@@ -8,9 +8,9 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE
-)
+knitr::opts_chunk$set(collapse = TRUE)
+library(stats)
+library(graphics)
 ```
 
 # Essential _R_
@@ -151,6 +151,27 @@ ggplot(tbl) +
     geom_smooth(method = "lm") # ...linear regresion
 ```
 
+## Where do Packages Come From?
+
+- [CRAN][]: *C*omprehensive *R* *A*rchive *N*etwork. More than 18,000
+  packages. Some help from [CRAN Task Views][] in identifying relevant
+  packages.
+
+- [Bioconductor][]: More than 2100 packages relevant to
+  high-throughput genomic analysis. _Vignettes_ are an important part
+  of _Bioconductor_ packages.
+  
+Install packages once per _R_ installation, using
+`BiocManager::install(<package-name>)` (CRAN or Bioconductor)
+
+What about GitHub? Packages haven't been checked by a formal system,
+so may have incomplete code, documentation, dependencies on other
+packages, etc. Authors may not yet be committed to long-term
+maintenance of their package.
+
+[CRAN]: https://cran.r-project.org/web/packages/available_packages_by_name.html
+[CRAN Task Views]: https://cran.r-project.org/web/views/
+[Bioconductor]: https://bioconductor.org/packages
 [dplyr]: https://cran.r-project.org/package=dplyr
 [ggplot2]: https://cran.r-project.org/package=ggplot2
 
@@ -160,10 +181,8 @@ ggplot(tbl) +
 
 2. Vignettes, e.g., 
 
-    ```{r}
-    vignette(package = "ggplot2")
-    ```
     ```{r, eval = FALSE}
+    vignette(package = "ggplot2")
     vignette("ggplot2-specs", "ggplot2")
     ```
 

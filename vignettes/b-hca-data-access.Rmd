@@ -8,12 +8,234 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-```{r setup}
+We use the following packages during this section of the workshop.
+
+```{r setup, message = FALSE}
+## package developed for this workshop
 library(HCABiocTraining)
+
+## general programming tools
+library(dplyr)
+library(ggplot2)
+
+## data access
+library(hca)
+library(cellxgenedp)
+
+## single cell data representation in R
+library(SingleCellExperiment) # Bioconductor representation
+library(Seurat)               # Seurat representation
 ```
+
+# Data Transformations
+
+FASTQ files
+
+- DNA sequences and quality scores
+- Very large
+- Processed e.g., by CellRanger or other software
+- Quality control, summary to count matrix (below)
+
+Count matrix
+
+- Usually genes (rows) x cells (columns)
+- Can be large (e.g., 30,000 genes x 50,000 cells)
+- Usually *very* sparse, e.g., 95% of cells '0'.
+- Still large enough to require a decent amount of computing power,
+  e.g., 32 GB RAM, 8 CPU for some steps.
+- Common formats
+
+  - CSV file -- lots of zero's so very wasteful of space.
+  - 'Matrix Market' sparse matrix files, e.g., tuples of <row, column,
+    count> for non-zero values.
+  - HDF5, e.g., [.loom][] or `.h5ad` ([anndata][]).
+
+- Representation in _R_
+
+  - In-memory sparse matrices: `dgCMatrix` class from the Matrix package
+  - On-disk representation via *Bioconductor*'s [DelayedArray][] /
+    [HDF5Array][].
+
+Counts & annotations
+
+- CSV and Matrix Market files store just counts; usually annotations
+  on columns (e.g., what sample did each cell come from?) are stored
+  separately.
+- HDF5 file formats coordinate row and column annotations with count
+  data.
+- *R* software tries to offer a coordinated representation of counts
+  and metadata, e.g., *Bioconductor*'s [SingleCellExperiment][].
+
+[anndata]: https://anndata.readthedocs.io/en/latest/index.html
+[.loom]: https://linnarssonlab.org/loompy/format/index.html
+[DelayedArray]: https://bioconductor.org/packages/DelayedArray
+[HDF5Array]: https://bioconductor.org/packages/HDF5Array
+
+# Data Discovery
+
+## Human Cell Atlas
+
+[Data portal][HCA-portal]
+
+![](images/HCADataPortal.png)
+
+What's available?
+
+- Project & sample annotations for HCA-funded projects
+- FASTQ files
+- 'Legacy' `.loom` files for about 50 experiments
+- *Ad hoc* count matrix data -- mostly CSV or Matrix Market files --
+  easy to download, but...
+- Count matrix data have uncertain provenance (how were they
+  computed?). Often considerable work required to create usable data,
+  e.g., [hcaCaseStudies][]
+
+## CellXGene
+
+[Data Portal][CXG-portal]
+
+![](images/CXGDP.png)
+
+What's available?
+
+- Collections and datasets contributed by the single-cell community,
+  with some overlap with data sets in the HCA Data Portal.
+- FASTQ files
+- `.h5ad`-summarized count data and cell metadata, as well as
+  reduced-dimension (e.g., UMAP) representations
+- Summarized count files provided by the contributor / individual lab,
+  so of uncertain provenance
+- Easy to download count matrix, e.g., in `.h5ad` (anndata) format
+- Easy to visualize (!)
+
+![](images/CXGViz.png)
+
+[HCA-portal]: https://data.humancellatlas.org/
+[CXG-portal]: https://cellxgene.cziscience.com/datasets
+
+# Programatic Discovery
+
+Why use an *R* script when the Data Portals exist?
+
+- Easily reproducible
+- Flexible exploration of rich & complex data
+- Direct integration with _Bioconductor_ single-cell workflows
+
+## Human Cell Atlas
+
+- See the [ExploratingHCACxG workshop][A-HCA] on HCA data retrieval
+  for retrieving legacy `.loom` files.
+  
+- See [hcaCaseStudies][] for examples of processing CSV and Matrix
+  Market files.
+
+[A-HCA]: https://mtmorgan.github.io/ExploringHCACxG/articles/A_HCA.html
+[hcaCaseStudies]: https://mtmorgan.github.io/hcaCaseStudies
+
+## CellXGene
+
+Load the [cellxgenedp][] package
+
+```{r}
+library(cellxgenedp)
+```
+
+Retrieve the current database, and use 'tidy' functionality to mimic
+the graphical selection in the web browser -- 10x 3' v3 (EFO:0009922)
+assay, Affrican American ethnicity, female gender)
+
+```{r}
+db <- db()
+african_american_female <-
+    datasets(db) |>
+    dplyr::filter(
+        facets_filter(assay, "ontology_term_id", "EFO:0009922"),
+        facets_filter(self_reported_ethnicity, "label", "African American"),
+        facets_filter(sex, "label", "female")
+    )
+african_american_female
+```
+
+'Join' selected datasets and files to identify the files associated
+with these datasets.
+
+```{r}
+selected_files <-
+    left_join(
+        african_american_female |> select(dataset_id),
+        files(db),
+        by = "dataset_id"
+    )
+selected_files
+```
+
+Filter the first 'CXG' file and visualize (open in the browser)...
+
+```{r}
+selected_files |>
+    dplyr::filter(filetype == "CXG") |>
+    dplyr::slice(1) |>
+    datasets_visualize()
+```
+
+...or select the 'H5AD' file and download it for subsequent processing in _R_
+
+```{r}
+h5ad_file <-
+    selected_files |>
+    dplyr::filter(filetype == "H5AD") |>
+    dplyr::slice(1) |>
+    files_download(dry.run = FALSE)
+```
+
+The downloaded file is cached, so the next time access is fast.
+
+# Representation in *R*
+
+## *SingleCellExperiment*
+
+Easy to work with reduced-dimension data...
+
+```{r}
+h5ad <- read_h5ad_as_sce(h5ad_file)
+h5ad
+
+umap <- as_tibble(reducedDim(h5ad, "X_umap"))
+
+ggplot(umap) +
+    aes(x = V1, y = V2, color = h5ad$cell_type) +
+    geom_point(pch = ".")
+```
+
+...but also counts data, e.g., distribution of reads per cell
+
+```{r}
+reads_per_cell <-
+    h5ad |>
+    ## retrieve the matrix of gene x cell counts
+    assay() |>
+    ## calculate the column sums, i.e., reads mapped to each cell
+    colSums()
+
+hist(log10(reads_per_cell))
+```
+
+...or to remove genes with non-zero counts
+
+```{r}
+reads_per_gene <-
+    h5ad |>
+    assay() |>
+    rowSums()
+
+table(reads_per_gene != 0)
+h5ad[reads_per_gene != 0,]
+```
+
+## *Seurat*
+
+[SingleCellExperiment]: https://bioconductor.org/packages/SingleCellExperiment
+[Seurat]: https://satijalab.org/seurat/

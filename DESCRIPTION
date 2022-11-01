@@ -1,7 +1,7 @@
 Package: HCABiocTraining
 Title: Introduction to Human Cell Atlas Data Access & Analysis in R /
     Bioconductor
-Version: 0.0.1
+Version: 0.0.2
 Authors@R:
     person(
         "Martin", "Morgan",
@@ -13,11 +13,9 @@ Description: A brief but comprehensive introduction to Human Cell
     Atlas data retrieval and analysis in R / Bioconductor.
 License: CC BY 4.0
 Encoding: UTF-8
-Depends: dplyr, ggplot2, hca, cellxgenedp
+Imports: Matrix, anndata, SingleCellExperiment
+Suggests: dplyr, ggplot2, hca, cellxgenedp, Seurat, knitr, rmarkdown
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 URL: https://mtmorgan.github.io/HCABiocTraining/
-Suggests: 
-    knitr,
-    rmarkdown
 VignetteBuilder: knitr
