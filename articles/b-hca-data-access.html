@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">HCABiocTraining</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,31 +73,302 @@
 
     
     
+<p>We use the following packages during this section of the
+workshop.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mtmorgan.github.io/HCABiocTraining/">HCABiocTraining</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: dplyr</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     filter, lag</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
-<span><span class="co">#&gt; Loading required package: ggplot2</span></span>
-<span><span class="co">#&gt; Loading required package: hca</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'hca'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     summary</span></span>
-<span><span class="co">#&gt; Loading required package: cellxgenedp</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'cellxgenedp'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:hca':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     files, files_download</span></span></code></pre></div>
-  </main>
+<code class="sourceCode R"><span><span class="co">## package developed for this workshop</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mtmorgan.github.io/HCABiocTraining/">HCABiocTraining</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## general programming tools</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## data access</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">hca</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">cellxgenedp</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## single cell data representation in R</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SingleCellExperiment</span><span class="op">)</span> <span class="co"># Bioconductor representation</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat" class="external-link">Seurat</a></span><span class="op">)</span>               <span class="co"># Seurat representation</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="data-transformations">Data Transformations<a class="anchor" aria-label="anchor" href="#data-transformations"></a>
+</h2>
+<p>FASTQ files</p>
+<ul>
+<li>DNA sequences and quality scores</li>
+<li>Very large</li>
+<li>Processed e.g., by CellRanger or other software</li>
+<li>Quality control, summary to count matrix (below)</li>
+</ul>
+<p>Count matrix</p>
+<ul>
+<li><p>Usually genes (rows) x cells (columns)</p></li>
+<li><p>Can be large (e.g., 30,000 genes x 50,000 cells)</p></li>
+<li><p>Usually <em>very</em> sparse, e.g., 95% of cells ‘0’.</p></li>
+<li><p>Still large enough to require a decent amount of computing power,
+e.g., 32 GB RAM, 8 CPU for some steps.</p></li>
+<li>
+<p>Common formats</p>
+<ul>
+<li>CSV file – lots of zero’s so very wasteful of space.</li>
+<li>‘Matrix Market’ sparse matrix files, e.g., tuples of &lt;row,
+column, count&gt; for non-zero values.</li>
+<li>HDF5, e.g., <a href="https://linnarssonlab.org/loompy/format/index.html" class="external-link">.loom</a> or
+<code>.h5ad</code> (<a href="https://anndata.readthedocs.io/en/latest/index.html" class="external-link">anndata</a>).</li>
+</ul>
+</li>
+<li>
+<p>Representation in <em>R</em></p>
+<ul>
+<li>In-memory sparse matrices: <code>dgCMatrix</code> class from the
+Matrix package</li>
+<li>On-disk representation via <em>Bioconductor</em>’s <a href="https://bioconductor.org/packages/DelayedArray" class="external-link">DelayedArray</a> /
+<a href="https://bioconductor.org/packages/HDF5Array" class="external-link">HDF5Array</a>.</li>
+</ul>
+</li>
+</ul>
+<p>Counts &amp; annotations</p>
+<ul>
+<li>CSV and Matrix Market files store just counts; usually annotations
+on columns (e.g., what sample did each cell come from?) are stored
+separately.</li>
+<li>HDF5 file formats coordinate row and column annotations with count
+data.</li>
+<li>
+<em>R</em> software tries to offer a coordinated representation of
+counts and metadata, e.g., <em>Bioconductor</em>’s <a href="https://bioconductor.org/packages/SingleCellExperiment" class="external-link">SingleCellExperiment</a>.</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="data-discovery">Data Discovery<a class="anchor" aria-label="anchor" href="#data-discovery"></a>
+</h2>
+<div class="section level3">
+<h3 id="human-cell-atlas">Human Cell Atlas<a class="anchor" aria-label="anchor" href="#human-cell-atlas"></a>
+</h3>
+<p><a href="https://data.humancellatlas.org/" class="external-link">Data portal</a></p>
+<p><img src="images/HCADataPortal.png"></p>
+<p>What’s available?</p>
+<ul>
+<li>Project &amp; sample annotations for HCA-funded projects</li>
+<li>FASTQ files</li>
+<li>‘Legacy’ <code>.loom</code> files for about 50 experiments</li>
+<li>
+<em>Ad hoc</em> count matrix data – mostly CSV or Matrix Market
+files – easy to download, but…</li>
+<li>Count matrix data have uncertain provenance (how were they
+computed?). Often considerable work required to create usable data,
+e.g., <a href="https://mtmorgan.github.io/hcaCaseStudies" class="external-link">hcaCaseStudies</a>
+</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="cellxgene">CellXGene<a class="anchor" aria-label="anchor" href="#cellxgene"></a>
+</h3>
+<p><a href="https://cellxgene.cziscience.com/datasets" class="external-link">Data
+Portal</a></p>
+<p><img src="images/CXGDP.png"></p>
+<p>What’s available?</p>
+<ul>
+<li>Collections and datasets contributed by the single-cell community,
+with some overlap with data sets in the HCA Data Portal.</li>
+<li>FASTQ files</li>
+<li>
+<code>.h5ad</code>-summarized count data and cell metadata, as well
+as reduced-dimension (e.g., UMAP) representations</li>
+<li>Summarized count files provided by the contributor / individual lab,
+so of uncertain provenance</li>
+<li>Easy to download count matrix, e.g., in <code>.h5ad</code> (anndata)
+format</li>
+<li>Easy to visualize (!)</li>
+</ul>
+<p><img src="images/CXGViz.png"></p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="programatic-discovery">Programatic Discovery<a class="anchor" aria-label="anchor" href="#programatic-discovery"></a>
+</h2>
+<p>Why use an <em>R</em> script when the Data Portals exist?</p>
+<ul>
+<li>Easily reproducible</li>
+<li>Flexible exploration of rich &amp; complex data</li>
+<li>Direct integration with <em>Bioconductor</em> single-cell
+workflows</li>
+</ul>
+<div class="section level3">
+<h3 id="human-cell-atlas-1">Human Cell Atlas<a class="anchor" aria-label="anchor" href="#human-cell-atlas-1"></a>
+</h3>
+<ul>
+<li><p>See the <a href="https://mtmorgan.github.io/ExploringHCACxG/articles/A_HCA.html" class="external-link">ExploratingHCACxG
+workshop</a> on HCA data retrieval for retrieving legacy
+<code>.loom</code> files.</p></li>
+<li><p>See <a href="https://mtmorgan.github.io/hcaCaseStudies" class="external-link">hcaCaseStudies</a> for
+examples of processing CSV and Matrix Market files.</p></li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="cellxgene-1">CellXGene<a class="anchor" aria-label="anchor" href="#cellxgene-1"></a>
+</h3>
+<p>Load the [cellxgenedp][] package</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">cellxgenedp</span><span class="op">)</span></span></code></pre></div>
+<p>Retrieve the current database, and use ‘tidy’ functionality to mimic
+the graphical selection in the web browser – 10x 3’ v3 (EFO:0009922)
+assay, Affrican American ethnicity, female gender)</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">db</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/cellxgenedp/man/db.html" class="external-link">db</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">african_american_female</span> <span class="op">&lt;-</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/cellxgenedp/man/query.html" class="external-link">datasets</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/pkg/cellxgenedp/man/facets.html" class="external-link">facets_filter</a></span><span class="op">(</span><span class="va">assay</span>, <span class="st">"ontology_term_id"</span>, <span class="st">"EFO:0009922"</span><span class="op">)</span>,</span>
+<span>        <span class="fu"><a href="https://rdrr.io/pkg/cellxgenedp/man/facets.html" class="external-link">facets_filter</a></span><span class="op">(</span><span class="va">self_reported_ethnicity</span>, <span class="st">"label"</span>, <span class="st">"African American"</span><span class="op">)</span>,</span>
+<span>        <span class="fu"><a href="https://rdrr.io/pkg/cellxgenedp/man/facets.html" class="external-link">facets_filter</a></span><span class="op">(</span><span class="va">sex</span>, <span class="st">"label"</span>, <span class="st">"female"</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span><span class="va">african_american_female</span></span>
+<span><span class="co">## <span style="color: #949494;"># A tibble: 21 × 28</span></span></span>
+<span><span class="co">##    dataset_id     colle…¹ donor…² assay  cell_…³ cell_…⁴ datas…⁵ devel…⁶ disease</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;list&gt;</span> </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> de985818-285f… c9706a… &lt;list&gt;  &lt;list&gt;   <span style="text-decoration: underline;">31</span>696 &lt;list&gt;  https:… &lt;list&gt;  &lt;list&gt; </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> f72958f5-7f42… 2f75d2… &lt;list&gt;  &lt;list&gt;  <span style="text-decoration: underline;">982</span>538 &lt;list&gt;  https:… &lt;list&gt;  &lt;list&gt; </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> bc2a7b3d-f04e… b9fc3d… &lt;list&gt;  &lt;list&gt;  <span style="text-decoration: underline;">109</span>995 &lt;list&gt;  https:… &lt;list&gt;  &lt;list&gt; </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> 96a3f64b-0ee9… b9fc3d… &lt;list&gt;  &lt;list&gt;  <span style="text-decoration: underline;">239</span>696 &lt;list&gt;  https:… &lt;list&gt;  &lt;list&gt; </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> d9b4bc69-ed90… b9fc3d… &lt;list&gt;  &lt;list&gt;   <span style="text-decoration: underline;">20</span>000 &lt;list&gt;  https:… &lt;list&gt;  &lt;list&gt; </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> 59b69042-47c2… b9fc3d… &lt;list&gt;  &lt;list&gt;   <span style="text-decoration: underline;">49</span>139 &lt;list&gt;  https:… &lt;list&gt;  &lt;list&gt; </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> e763ed0d-0e5a… b9fc3d… &lt;list&gt;  &lt;list&gt;    <span style="text-decoration: underline;">7</span>274 &lt;list&gt;  https:… &lt;list&gt;  &lt;list&gt; </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> db0752b9-f20e… b9fc3d… &lt;list&gt;  &lt;list&gt;   <span style="text-decoration: underline;">55</span>348 &lt;list&gt;  https:… &lt;list&gt;  &lt;list&gt; </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> e9175006-8978… 62e8f0… &lt;list&gt;  &lt;list&gt;   <span style="text-decoration: underline;">14</span>072 &lt;list&gt;  https:… &lt;list&gt;  &lt;list&gt; </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> d224c8e0-c28e… 62e8f0… &lt;list&gt;  &lt;list&gt;    <span style="text-decoration: underline;">8</span>030 &lt;list&gt;  https:… &lt;list&gt;  &lt;list&gt; </span></span>
+<span><span class="co">## <span style="color: #949494;"># … with 11 more rows, 19 more variables: is_primary_data &lt;chr&gt;,</span></span></span>
+<span><span class="co">## <span style="color: #949494;">#   is_valid &lt;lgl&gt;, linked_genesets &lt;lgl&gt;, mean_genes_per_cell &lt;dbl&gt;,</span></span></span>
+<span><span class="co">## <span style="color: #949494;">#   name &lt;chr&gt;, organism &lt;list&gt;, processing_status &lt;list&gt;, published &lt;lgl&gt;,</span></span></span>
+<span><span class="co">## <span style="color: #949494;">#   revision &lt;int&gt;, schema_version &lt;chr&gt;, self_reported_ethnicity &lt;list&gt;,</span></span></span>
+<span><span class="co">## <span style="color: #949494;">#   sex &lt;list&gt;, suspension_type &lt;list&gt;, tissue &lt;list&gt;, tombstone &lt;lgl&gt;,</span></span></span>
+<span><span class="co">## <span style="color: #949494;">#   created_at &lt;date&gt;, published_at &lt;date&gt;, revised_at &lt;date&gt;,</span></span></span>
+<span><span class="co">## <span style="color: #949494;">#   updated_at &lt;date&gt;, and abbreviated variable names ¹​collection_id, …</span></span></span></code></pre></div>
+<p>‘Join’ selected datasets and files to identify the files associated
+with these datasets.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">selected_files</span> <span class="op">&lt;-</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span></span>
+<span>        <span class="va">african_american_female</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">dataset_id</span><span class="op">)</span>,</span>
+<span>        <span class="fu"><a href="https://rdrr.io/pkg/cellxgenedp/man/query.html" class="external-link">files</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span>,</span>
+<span>        by <span class="op">=</span> <span class="st">"dataset_id"</span></span>
+<span>    <span class="op">)</span></span>
+<span><span class="va">selected_files</span></span>
+<span><span class="co">## <span style="color: #949494;"># A tibble: 63 × 8</span></span></span>
+<span><span class="co">##    dataset_id       file_id filen…¹ filet…² s3_uri user_…³ created_at updated_at</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;date&gt;</span>    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> de985818-285f-4… 15e9d9… local.… H5AD    s3://… TRUE    2022-10-21 2022-10-21</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> de985818-285f-4… 0d3974… explor… CXG     s3://… TRUE    2022-10-21 2022-10-21</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> de985818-285f-4… e254f9… local.… RDS     s3://… TRUE    2022-10-21 2022-10-21</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> f72958f5-7f42-4… 59bd46… local.… RDS     s3://… TRUE    2022-10-18 2022-10-18</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> f72958f5-7f42-4… 3a2467… explor… CXG     s3://… TRUE    2022-10-18 2022-10-18</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> f72958f5-7f42-4… d9f9d0… local.… H5AD    s3://… TRUE    2022-10-18 2022-10-18</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> bc2a7b3d-f04e-4… f6d9f2… local.… H5AD    s3://… TRUE    2022-10-18 2022-10-18</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> bc2a7b3d-f04e-4… 46de9c… explor… CXG     s3://… TRUE    2022-10-18 2022-10-18</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> bc2a7b3d-f04e-4… 5331f2… local.… RDS     s3://… TRUE    2022-10-18 2022-10-18</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> 96a3f64b-0ee9-4… b77452… local.… H5AD    s3://… TRUE    2022-10-18 2022-10-18</span></span>
+<span><span class="co">## <span style="color: #949494;"># … with 53 more rows, and abbreviated variable names ¹​filename, ²​filetype,</span></span></span>
+<span><span class="co">## <span style="color: #949494;">#   ³​user_submitted</span></span></span></code></pre></div>
+<p>Filter the first ‘CXG’ file and visualize (open in the browser)…</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">selected_files</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">filetype</span> <span class="op">==</span> <span class="st">"CXG"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/cellxgenedp/man/query.html" class="external-link">datasets_visualize</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>…or select the ‘H5AD’ file and download it for subsequent processing
+in <em>R</em></p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">h5ad_file</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">selected_files</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">filetype</span> <span class="op">==</span> <span class="st">"H5AD"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/cellxgenedp/man/query.html" class="external-link">files_download</a></span><span class="op">(</span>dry.run <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p>The downloaded file is cached, so the next time access is fast.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="representation-in-r">Representation in <em>R</em><a class="anchor" aria-label="anchor" href="#representation-in-r"></a>
+</h2>
+<div class="section level3">
+<h3 id="singlecellexperiment">
+<em>SingleCellExperiment</em><a class="anchor" aria-label="anchor" href="#singlecellexperiment"></a>
+</h3>
+<p>Easy to work with reduced-dimension data…</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">h5ad</span> <span class="op">&lt;-</span> <span class="fu">read_h5ad_as_sce</span><span class="op">(</span><span class="va">h5ad_file</span><span class="op">)</span></span>
+<span><span class="va">h5ad</span></span>
+<span><span class="co">## class: SingleCellExperiment </span></span>
+<span><span class="co">## dim: 33234 31696 </span></span>
+<span><span class="co">## metadata(3): default_embedding schema_version title</span></span>
+<span><span class="co">## assays(1): X</span></span>
+<span><span class="co">## rownames(33234): ENSG00000243485 ENSG00000237613 ... ENSG00000277475</span></span>
+<span><span class="co">##   ENSG00000268674</span></span>
+<span><span class="co">## rowData names(4): feature_is_filtered feature_name feature_reference</span></span>
+<span><span class="co">##   feature_biotype</span></span>
+<span><span class="co">## colnames(31696): CMGpool_AAACCCAAGGACAACC CMGpool_AAACCCACAATCTCTT ...</span></span>
+<span><span class="co">##   K109064_TTTGTTGGTTGCATCA K109064_TTTGTTGGTTGGACCC</span></span>
+<span><span class="co">## colData names(34): donor_id self_reported_ethnicity_ontology_term_id</span></span>
+<span><span class="co">##   ... self_reported_ethnicity development_stage</span></span>
+<span><span class="co">## reducedDimNames(3): X_pca X_tsne X_umap</span></span>
+<span><span class="co">## mainExpName: NULL</span></span>
+<span><span class="co">## altExpNames(0):</span></span>
+<span></span>
+<span><span class="va">umap</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SingleCellExperiment/man/reducedDims.html" class="external-link">reducedDim</a></span><span class="op">(</span><span class="va">h5ad</span>, <span class="st">"X_umap"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">## Warning: The `x` argument of `as_tibble.matrix()` must have unique column names if</span></span>
+<span><span class="co">## `.name_repair` is omitted as of tibble 2.0.0.</span></span>
+<span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Using compatibility `.name_repair`.</span></span>
+<span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">umap</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">V1</span>, y <span class="op">=</span> <span class="va">V2</span>, color <span class="op">=</span> <span class="va">h5ad</span><span class="op">$</span><span class="va">cell_type</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>pch <span class="op">=</span> <span class="st">"."</span><span class="op">)</span></span></code></pre></div>
+<p><img src="b-hca-data-access_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+<p>…but also counts data, e.g., distribution of reads per cell</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">reads_per_cell</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">h5ad</span> <span class="op">|&gt;</span></span>
+<span>    <span class="co">## retrieve the matrix of gene x cell counts</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assay</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="co">## calculate the column sums, i.e., reads mapped to each cell</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log10</a></span><span class="op">(</span><span class="va">reads_per_cell</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="b-hca-data-access_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<p>…or to remove genes with non-zero counts</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">reads_per_gene</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">h5ad</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">assay</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">reads_per_gene</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## FALSE  TRUE </span></span>
+<span><span class="co">## 10499 22735</span></span>
+<span><span class="va">h5ad</span><span class="op">[</span><span class="va">reads_per_gene</span> <span class="op">!=</span> <span class="fl">0</span>,<span class="op">]</span></span>
+<span><span class="co">## class: SingleCellExperiment </span></span>
+<span><span class="co">## dim: 22735 31696 </span></span>
+<span><span class="co">## metadata(3): default_embedding schema_version title</span></span>
+<span><span class="co">## assays(1): X</span></span>
+<span><span class="co">## rownames(22735): ENSG00000238009 ENSG00000237491 ... ENSG00000276345</span></span>
+<span><span class="co">##   ENSG00000271254</span></span>
+<span><span class="co">## rowData names(4): feature_is_filtered feature_name feature_reference</span></span>
+<span><span class="co">##   feature_biotype</span></span>
+<span><span class="co">## colnames(31696): CMGpool_AAACCCAAGGACAACC CMGpool_AAACCCACAATCTCTT ...</span></span>
+<span><span class="co">##   K109064_TTTGTTGGTTGCATCA K109064_TTTGTTGGTTGGACCC</span></span>
+<span><span class="co">## colData names(34): donor_id self_reported_ethnicity_ontology_term_id</span></span>
+<span><span class="co">##   ... self_reported_ethnicity development_stage</span></span>
+<span><span class="co">## reducedDimNames(3): X_pca X_tsne X_umap</span></span>
+<span><span class="co">## mainExpName: NULL</span></span>
+<span><span class="co">## altExpNames(0):</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="seurat">
+<em>Seurat</em><a class="anchor" aria-label="anchor" href="#seurat"></a>
+</h3>
+</div>
+</div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
