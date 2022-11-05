@@ -8,12 +8,21 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+knitr::opts_chunk$set(collapse = TRUE)
 ```
 
 ```{r setup}
 library(HCABiocTraining)
 ```
+
+Based on [Orchestrating Single-Cell Analysis with Bioconductor][OSCA].
+
+[OSCA]: http://bioconductor.org/books/3.16/OSCA.basic/
+
+# Normalization
+
+# Feature Selection
+
+# Dimensionality Reduction
+
+# Cell Type Annotation

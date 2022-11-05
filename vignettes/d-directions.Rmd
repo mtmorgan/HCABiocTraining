@@ -8,12 +8,21 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+knitr::opts_chunk$set(collapse = TRUE)
 ```
 
 ```{r setup}
 library(HCABiocTraining)
 ```
+
+# Directions
+
+## Spatial Transcriptomics
+
+[Orchestrating Spatially-Resolved Transcriptomics Analysis with Bioconductor][OSTA]
+
+[OSTA]: https://lmweber.org/OSTA-book/
+
+## Image Analysis
+
+# Seurat, Bioconductor, AnnData, ...

@@ -172,22 +172,40 @@ selected_files <-
 selected_files
 ```
 
-Filter the first 'CXG' file and visualize (open in the browser)...
+Select the first 'CXG' file available in this subset of data; for
+reproducibility we retrieve the dataset id...
 
 ```{r}
 selected_files |>
     dplyr::filter(filetype == "CXG") |>
     dplyr::slice(1) |>
+    pull(dataset_id)
+## "de985818-285f-4f59-9dbd-d74968fddba3"
+```
+
+... and set it; the helper function `cxg_dataset()` provides a summary
+of this dataset.
+
+```{r}
+dataset <- "de985818-285f-4f59-9dbd-d74968fddba3"
+cxg_dataset(dataset)
+```
+
+Visualize this 'CXG' file in the browser...
+
+```{r}
+selected_files |>
+    dplyr::filter(filetype == "CXG", dataset_id == dataset) |>
     datasets_visualize()
 ```
 
-...or select the 'H5AD' file and download it for subsequent processing in _R_
+...or select the 'H5AD' file associated with the dataset and download
+it for subsequent processing in _R_
 
 ```{r}
 h5ad_file <-
     selected_files |>
-    dplyr::filter(filetype == "H5AD") |>
-    dplyr::slice(1) |>
+    dplyr::filter(filetype == "H5AD", dataset_id == dataset) |>
     files_download(dry.run = FALSE)
 ```
 
@@ -234,6 +252,22 @@ reads_per_gene <-
 table(reads_per_gene != 0)
 h5ad[reads_per_gene != 0,]
 ```
+
+It's also very easy to find out information about the samples included
+in the study, e.g., the individual donors, their ethnicty, and family
+history of breast cancer (the specific information available depends
+on the data submitted by the original investigator).
+
+```{r}
+SingleCellExperiment::colData(h5ad) |>
+    as_tibble() |>
+    dplyr::count(
+        donor_id, self_reported_ethnicity, family_history_breast_cancer
+    )
+```
+
+Glancing at this table, we see that there is little replication that
+does not have serious confounding factors.
 
 ## *Seurat*
 

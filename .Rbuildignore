@@ -3,3 +3,5 @@
 ^docs$
 ^pkgdown$
 ^\.github$
+^hca_training_venv
+^napari_venv
