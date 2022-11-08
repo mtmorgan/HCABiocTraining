@@ -13,7 +13,7 @@ Description: A brief but comprehensive introduction to Human Cell
     Atlas data retrieval and analysis in R / Bioconductor.
 License: CC BY 4.0
 Encoding: UTF-8
-Imports: Matrix, anndata, SingleCellExperiment
+Imports: Matrix, anndata, rjsoncons, SingleCellExperiment
 Suggests: dplyr, ggplot2, hca, cellxgenedp, Seurat, knitr, rmarkdown
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
