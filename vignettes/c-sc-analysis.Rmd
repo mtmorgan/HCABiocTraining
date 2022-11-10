@@ -11,18 +11,127 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-```{r setup}
+```{r setup, message = FALSE}
 library(HCABiocTraining)
+
+## data access
+library(cellxgenedp)
+
+## single cell data representation in R
+library(SingleCellExperiment) # Bioconductor representation
+
+## general programming tools
+library(dplyr)
+library(ggplot2)
+library(plotly)
 ```
+
+# Exploring Pre-computed Data
+
+We illustrate these steps with data from CELLxGENE retrieved in the
+previous article. For our own data we would need to proceed from a
+simple count matrix produced by Cell Ranger (etc.) through careful
+quality control, normalization, data integration / batch coorrection,
+etc., as illustrated in a subsequent section.
+
+## Data retrieval
+
+The following is an abbreviated version of the steps illustrated in
+the previous article.
+
+```{r}
+## use a known dataset ID, discovered previously..
+dataset <- "de985818-285f-4f59-9dbd-d74968fddba3"
+cxg_dataset(dataset)
+
+## download (or retieve from the local cache) the file
+h5ad_file <-
+    files() |>
+    dplyr::filter(filetype == "H5AD", dataset_id == dataset) |>
+    files_download(dry.run = FALSE)
+
+## import into R as a SingleCellExperiment
+h5ad <- read_h5ad_as_sce(h5ad_file)
+
+h5ad
+```
+
+## Visualization
+
+The previous article created a static visualization from the 'UMAP'
+reduced dimension representation. First load [ggplot2][]
+
+[ggplot2]: https://cran.r-project.org/package=ggplot2
+
+```{r}
+library(ggplot2)
+```
+
+Then create a tibble containing information about the UMAP, as well as
+cell (column) annotations
+
+```{r}
+umap <-
+    as_tibble(reducedDim(h5ad, "X_umap")) |>
+    bind_cols(
+        cell_type = h5ad$cell_type,
+        donor_id = h5ad$donor_id,
+        self_reported_ethnicity = h5ad$self_reported_ethnicity,
+        colname = colnames(h5ad) # unique identifier
+    )
+```
+
+Visualize the two-dimensional UMAP summary, coloring by cell type
+
+```{r}
+ggplot(umap) +
+    aes(x = V1, y = V2, color = cell_type) +
+    geom_point(pch = ".")
+```
+
+The [plotly][] package provides a very convenient way to make this an
+interactive plot
+
+[plotly]: https://cran.r-project.org/package=plotly
+
+```{r}
+library(plotly)
+
+plot_ly(
+    umap,
+    x = ~ V1, y =  ~ V2, color = ~ cell_type,
+    type = "scatter", mode = "markers", opacity = .5,
+    marker = list(symbol = "circle-open", line = list(width = 1))
+)
+```
+
+A suprisingly straight-forward (but admittedly advanced) helper
+function uses [shiny][] to allows us to write an application to select
+data we are interested in... check it out!
+
+[shiny]: https://cran.r-project.org/package=shiny
+
+```{r, eval = FALSE}
+result <- tutorial_cell_viewer(umap) # select some cells of interest
+result
+## subset the SingleCellExperiment to just those cells
+h5ad[, result$colname]
+```
+
+## Gene Sets
+
+## Psuedo-Bulk Differential Expression
+
+# Essential Steps
 
 Based on [Orchestrating Single-Cell Analysis with Bioconductor][OSCA].
 
 [OSCA]: http://bioconductor.org/books/3.16/OSCA.basic/
 
-# Normalization
+## Normalization
 
-# Feature Selection
+## Feature Selection
 
-# Dimensionality Reduction
+## Dimensionality Reduction
 
-# Cell Type Annotation
+## Cell Type Annotation
