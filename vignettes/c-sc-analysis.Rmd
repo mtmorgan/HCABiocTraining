@@ -42,7 +42,7 @@ the previous article.
 ```{r}
 ## use a known dataset ID, discovered previously..
 dataset <- "de985818-285f-4f59-9dbd-d74968fddba3"
-cxg_dataset(dataset)
+training_cxg_dataset(dataset)
 
 ## download (or retieve from the local cache) the file
 h5ad_file <-
@@ -51,7 +51,7 @@ h5ad_file <-
     files_download(dry.run = FALSE)
 
 ## import into R as a SingleCellExperiment
-h5ad <- read_h5ad_as_sce(h5ad_file)
+h5ad <- training_read_h5ad_as_sce(h5ad_file)
 
 h5ad
 ```
@@ -112,7 +112,7 @@ data we are interested in... check it out!
 [shiny]: https://cran.r-project.org/package=shiny
 
 ```{r, eval = FALSE}
-result <- tutorial_cell_viewer(umap) # select some cells of interest
+result <- training_cell_viewer(umap) # select some cells of interest
 result
 ## subset the SingleCellExperiment to just those cells
 h5ad[, result$colname]

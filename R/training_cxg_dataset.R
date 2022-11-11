@@ -1,4 +1,4 @@
-#' @rdname cxg_dataset
+#' @rdname training_cxg_dataset
 #'
 #' @title Summarize CxG Information About a Dataset
 #'
@@ -15,11 +15,11 @@
 #'
 #' @examples
 #' dataset <- "de985818-285f-4f59-9dbd-d74968fddba3"
-#' ds <- cxg_dataset(dataset)
+#' ds <- training_cxg_dataset(dataset)
 #' ds
 #'
 #' @export
-cxg_dataset <-
+training_cxg_dataset <-
     function(dataset_id)
 {
     id <- dataset_id
@@ -77,10 +77,10 @@ cxg_dataset <-
     paste(strwrap(x, indent = indent, exdent = exdent), collapse = "\n")
 }
 
-#' @rdname cxg_dataset
+#' @rdname training_cxg_dataset
 #'
 #' @param x A `cxg_dataset` object resulting from a call to
-#'     `cxg_dataset()`.
+#'     `training_cxg_dataset()`.
 #'
 #' @param ... Additional arguments (to `print.cxg_dataset()`); ignored.
 #'

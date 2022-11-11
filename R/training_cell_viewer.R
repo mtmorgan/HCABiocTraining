@@ -57,7 +57,7 @@
     }
 }
 
-#' @rdname tutorial_cell_viewer
+#' @rdname training_cell_viewer
 #'
 #' @title Interactively Visualize and Subset UMAPs
 #'
@@ -66,7 +66,7 @@
 #' @importFrom shiny runGadget
 #'
 #' @export
-tutorial_cell_viewer <-
+training_cell_viewer <-
     function(umap)
 {
     stopifnot(

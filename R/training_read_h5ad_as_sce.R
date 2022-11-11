@@ -1,4 +1,4 @@
-#' @rdname read_h5ad
+#' @rdname training_read_h5ad
 #'
 #' @title Read 'h5ad' Files as R / Bioconductor Objects
 #'
@@ -8,7 +8,7 @@
 #'
 #' @param h5ad_file_path `character(1)` path to the `.h5ad` file.
 #'
-#' @return `read_h5ad_as_sce()` returns an R / Bioconductor
+#' @return `training_read_h5ad_as_sce()` returns an R / Bioconductor
 #'     SingleCellExperiment object. The assay data `X` is the (sparse)
 #'     matrix named 'X' in the h5ad file.
 #' 
@@ -17,7 +17,7 @@
 #' @importFrom SingleCellExperiment SingleCellExperiment
 #'
 #' @export
-read_h5ad_as_sce <-
+training_read_h5ad_as_sce <-
     function(h5ad_file_path)
 {
     h5ad <- read_h5ad(h5ad_file_path)
