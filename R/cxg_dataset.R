@@ -5,11 +5,13 @@
 #' @param dataset_id character(1) dataset identifier, as returned by,
 #'     e.g., `datasets()`.
 #'
-#' @importFrom dplyr filter
+#' @importFrom dplyr filter .data
 #'
 #' @importFrom rjsoncons jmespath
 #'
 #' @importFrom jsonlite toJSON fromJSON
+#'
+#' @importFrom cellxgenedp db datasets collections
 #'
 #' @examples
 #' dataset <- "de985818-285f-4f59-9dbd-d74968fddba3"
@@ -18,9 +20,10 @@
 #'
 #' @export
 cxg_dataset <-
-    function(dataset_id, cellxgene_db = db())
+    function(dataset_id)
 {
     id <- dataset_id
+    cellxgene_db = db()
 
     ## retrieve dataset and collection information
     dataset <-
@@ -75,6 +78,11 @@ cxg_dataset <-
 }
 
 #' @rdname cxg_dataset
+#'
+#' @param x A `cxg_dataset` object resulting from a call to
+#'     `cxg_dataset()`.
+#'
+#' @param ... Additional arguments (to `print.cxg_dataset()`); ignored.
 #'
 #' @export
 print.cxg_dataset <-

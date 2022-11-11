@@ -57,12 +57,23 @@
     }
 }
 
+#' @rdname tutorial_cell_viewer
+#'
+#' @title Interactively Visualize and Subset UMAPs
+#'
+#' @param umap a `tibble()` with
+#'
 #' @importFrom shiny runGadget
 #'
 #' @export
 tutorial_cell_viewer <-
     function(umap)
 {
+    stopifnot(
+        inherits(umap, "tbl"),
+        c("V1", "V2", "colname") %in% colnames(umap)
+    )
+
     suppressMessages({
         runGadget(.cell_viewer_ui(umap), .cell_viewer_server(umap))
     })

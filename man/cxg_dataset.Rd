@@ -5,13 +5,18 @@
 \alias{print.cxg_dataset}
 \title{Summarize CxG Information About a Dataset}
 \usage{
-cxg_dataset(dataset_id, cellxgene_db = db())
+cxg_dataset(dataset_id)
 
 \method{print}{cxg_dataset}(x, ...)
 }
 \arguments{
 \item{dataset_id}{character(1) dataset identifier, as returned by,
 e.g., \code{datasets()}.}
+
+\item{x}{A \code{cxg_dataset} object resulting from a call to
+\code{cxg_dataset()}.}
+
+\item{...}{Additional arguments (to \code{print.cxg_dataset()}); ignored.}
 }
 \description{
 Summarize CxG Information About a Dataset
