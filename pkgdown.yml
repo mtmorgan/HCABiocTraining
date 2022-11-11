@@ -1,4 +1,4 @@
-pandoc: 2.17.1.1
+pandoc: 2.19.2
 pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
@@ -6,7 +6,7 @@ articles:
   b-hca-data-access: b-hca-data-access.html
   c-sc-analysis: c-sc-analysis.html
   d-directions: d-directions.html
-last_built: 2022-11-04T18:36Z
+last_built: 2022-11-11T17:33Z
 urls:
   reference: https://mtmorgan.github.io/HCABiocTraining/reference
   article: https://mtmorgan.github.io/HCABiocTraining/articles
