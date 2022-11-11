@@ -18,5 +18,7 @@ Imports: Matrix, anndata, rjsoncons, SingleCellExperiment,
 Suggests: ggplot2, hca, cellxgenedp, Seurat, knitr, rmarkdown
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
-URL: https://mtmorgan.github.io/HCABiocTraining, https://github.com/mtmorgan/HCABiocTraining 
+URL: https://mtmorgan.github.io/HCABiocTraining
+BugReposrts: https://github.com/mtmorgan/HCABiocTraining/issues
 VignetteBuilder: knitr
+DockerImage: ghcr.io/mtmorgan/hcabioctraining
