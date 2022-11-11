@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">HCABiocTraining</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -285,11 +285,11 @@ reproducibility we retrieve the dataset id…</p>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">dataset_id</span><span class="op">)</span></span>
 <span><span class="co">## [1] "de985818-285f-4f59-9dbd-d74968fddba3"</span></span>
 <span><span class="co">## "de985818-285f-4f59-9dbd-d74968fddba3"</span></span></code></pre></div>
-<p>… and set it; the helper function <code><a href="../reference/cxg_dataset.html">cxg_dataset()</a></code> provides
-a summary of this dataset.</p>
+<p>… and set it; the helper function <code><a href="../reference/training_cxg_dataset.html">training_cxg_dataset()</a></code>
+provides a summary of this dataset.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dataset</span> <span class="op">&lt;-</span> <span class="st">"de985818-285f-4f59-9dbd-d74968fddba3"</span></span>
-<span><span class="fu"><a href="../reference/cxg_dataset.html">cxg_dataset</a></span><span class="op">(</span><span class="va">dataset</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/training_cxg_dataset.html">training_cxg_dataset</a></span><span class="op">(</span><span class="va">dataset</span><span class="op">)</span></span>
 <span><span class="co">## title: A single-cell atlas of the healthy breast tissues reveals</span></span>
 <span><span class="co">##     clinically relevant clusters of breast epithelial cells</span></span>
 <span><span class="co">## description: Single-cell RNA sequencing (scRNA-seq) is an evolving</span></span>
@@ -342,7 +342,7 @@ it for subsequent processing in <em>R</em></p>
 </h3>
 <p>Easy to work with reduced-dimension data…</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">h5ad</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_h5ad.html">read_h5ad_as_sce</a></span><span class="op">(</span><span class="va">h5ad_file</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">h5ad</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/training_read_h5ad.html">training_read_h5ad_as_sce</a></span><span class="op">(</span><span class="va">h5ad_file</span><span class="op">)</span></span>
 <span><span class="va">h5ad</span></span>
 <span><span class="co">## class: SingleCellExperiment </span></span>
 <span><span class="co">## dim: 33234 31696 </span></span>

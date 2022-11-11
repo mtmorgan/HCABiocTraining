@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">HCABiocTraining</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -118,7 +118,7 @@
 <p>Functions</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span>        <span class="co"># 5 random normal deviates</span></span>
-<span><span class="co">## [1] -0.9804657 -1.0160537 -0.1154069 -1.3163632  0.5317101</span></span>
+<span><span class="co">## [1]  0.7914065 -0.2766008  0.3651993 -1.1420496 -1.1205813</span></span>
 <span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span> <span class="co"># 100 random normal deviates</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>         <span class="co"># histogram, approximately normal</span></span></code></pre></div>
 <p><img src="a-intro-to-r_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
@@ -138,7 +138,7 @@ explicit ‘for’ loop</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## Coefficients:</span></span>
 <span><span class="co">## (Intercept)            x  </span></span>
-<span><span class="co">##     -0.1358       1.0283</span></span>
+<span><span class="co">##   -0.002954     0.936279</span></span>
 <span>            <span class="co"># regression of y on x</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="co"># plot points and fitted regression line</span></span></code></pre></div>
 <p><img src="a-intro-to-r_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
@@ -147,9 +147,9 @@ explicit ‘for’ loop</p>
 <span><span class="co">## Analysis of Variance Table</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Response: y</span></span>
-<span><span class="co">##           Df  Sum Sq Mean Sq F value    Pr(&gt;F)    </span></span>
-<span><span class="co">## x          1 106.904 106.904  109.74 &lt; 2.2e-16 ***</span></span>
-<span><span class="co">## Residuals 98  95.466   0.974                      </span></span>
+<span><span class="co">##           Df Sum Sq Mean Sq F value    Pr(&gt;F)    </span></span>
+<span><span class="co">## x          1 59.835  59.835   58.87 1.258e-11 ***</span></span>
+<span><span class="co">## Residuals 98 99.607   1.016                      </span></span>
 <span><span class="co">## ---</span></span>
 <span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 <p>Write your own functions</p>
@@ -182,7 +182,7 @@ distribution…</p>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.sleep.html" class="external-link">Sys.sleep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.002   0.000   8.011</span></span>
+<span><span class="co">##   0.003   0.000   8.010</span></span>
 <span></span>
 <span><span class="co">## sleep in parallel -- takes only 2 seconds</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">parallel</span><span class="op">)</span></span>
@@ -206,18 +206,18 @@ the ‘tidyverse’</p>
 <span><span class="co">## e.g., only displays the first 10 rows</span></span>
 <span><span class="va">tbl</span></span>
 <span><span class="co">## <span style="color: #949494;"># A tibble: 100 × 2</span></span></span>
-<span><span class="co">##          x      y</span></span>
-<span><span class="co">##      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>  2.13    3.55 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>  0.077<span style="text-decoration: underline;">9</span> -<span style="color: #BB0000;">1.14</span> </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>  1.25    1.22 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>  0.847   1.28 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> -<span style="color: #BB0000;">1.08</span>   -<span style="color: #BB0000;">2.38</span> </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>  0.151  -<span style="color: #BB0000;">0.736</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>  1.07    0.828</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> -<span style="color: #BB0000;">0.572</span>  -<span style="color: #BB0000;">1.86</span> </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> -<span style="color: #BB0000;">0.836</span>  -<span style="color: #BB0000;">1.10</span> </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>  0.218  -<span style="color: #BB0000;">0.842</span></span></span>
+<span><span class="co">##           x       y</span></span>
+<span><span class="co">##       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>  0.460   -<span style="color: #BB0000;">0.506</span> </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> -<span style="color: #BB0000;">2.07</span>    -<span style="color: #BB0000;">2.08</span>  </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> -<span style="color: #BB0000;">1.52</span>    -<span style="color: #BB0000;">1.26</span>  </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> -<span style="color: #BB0000;">1.54</span>    -<span style="color: #BB0000;">0.953</span> </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> -<span style="color: #BB0000;">1.34</span>    -<span style="color: #BB0000;">1.53</span>  </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> -<span style="color: #BB0000;">1.96</span>    -<span style="color: #BB0000;">2.15</span>  </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>  0.345    0.031<span style="text-decoration: underline;">7</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>  0.005<span style="text-decoration: underline;">63</span> -<span style="color: #BB0000;">0.551</span> </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  2.48     1.65  </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> -<span style="color: #BB0000;">0.858</span>   -<span style="color: #BB0000;">1.08</span>  </span></span>
 <span><span class="co">## <span style="color: #949494;"># … with 90 more rows</span></span></span></code></pre></div>
 <p>The tidyverse makes use of ‘pipes’ <code>|&gt;</code>. A pipe takes
 the left-hand side and pass through to the right-hand side. Key <a href="https://cran.r-project.org/package=dplyr" class="external-link">dplyr</a> ‘verbs’ can be
@@ -230,20 +230,20 @@ piped together: <code><a href="https://dplyr.tidyverse.org/reference/filter.html
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="va">y</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="co">## add a column</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>distance_from_origin <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">y</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">## <span style="color: #949494;"># A tibble: 31 × 3</span></span></span>
+<span><span class="co">## <span style="color: #949494;"># A tibble: 38 × 3</span></span></span>
 <span><span class="co">##        x      y distance_from_origin</span></span>
 <span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> 2.13  3.55                  4.14 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> 1.25  1.22                  1.75 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> 0.847 1.28                  1.54 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> 1.07  0.828                 1.36 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> 1.15  0.601                 1.30 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> 0.247 0.122                 0.275</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> 1.38  1.13                  1.79 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> 0.598 0.891                 1.07 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> 0.179 0.888                 0.906</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> 0.279 0.084<span style="text-decoration: underline;">8</span>                0.292</span></span>
-<span><span class="co">## <span style="color: #949494;"># … with 21 more rows</span></span></span></code></pre></div>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> 0.345 0.031<span style="text-decoration: underline;">7</span>                0.347</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> 2.48  1.65                  2.98 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> 0.598 0.267                 0.655</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> 1.23  1.91                  2.27 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> 2.34  2.21                  3.22 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> 1.18  1.27                  1.74 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> 0.346 1.39                  1.43 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> 0.959 2.31                  2.50 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> 2.36  1.66                  2.88 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> 0.106 0.503                 0.514</span></span>
+<span><span class="co">## <span style="color: #949494;"># … with 28 more rows</span></span></span></code></pre></div>
 <p>Another example: <a href="https://cran.r-project.org/package=ggplot2" class="external-link">ggplot2</a> for
 visualization</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">

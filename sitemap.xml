@@ -28,15 +28,15 @@
     <loc>https://mtmorgan.github.io/HCABiocTraining/index.html</loc>
   </url>
   <url>
-    <loc>https://mtmorgan.github.io/HCABiocTraining/reference/cxg_dataset.html</loc>
-  </url>
-  <url>
     <loc>https://mtmorgan.github.io/HCABiocTraining/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://mtmorgan.github.io/HCABiocTraining/reference/read_h5ad.html</loc>
+    <loc>https://mtmorgan.github.io/HCABiocTraining/reference/training_cell_viewer.html</loc>
   </url>
   <url>
-    <loc>https://mtmorgan.github.io/HCABiocTraining/reference/tutorial_cell_viewer.html</loc>
+    <loc>https://mtmorgan.github.io/HCABiocTraining/reference/training_cxg_dataset.html</loc>
+  </url>
+  <url>
+    <loc>https://mtmorgan.github.io/HCABiocTraining/reference/training_read_h5ad.html</loc>
   </url>
 </urlset>
