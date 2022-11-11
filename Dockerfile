@@ -1,13 +1,8 @@
 FROM bioconductor/bioconductor_docker:RELEASE_3_16
 
-## install packages etc as 'rstudio' user
-USER rstudio
-WORKDIR /home/rstudio
+COPY --chown=rstudio:rstudio . /home/rstudio/HCABiocTraining
 
-COPY --chown=rstudio:rstudio . /home/rstudio/src/HCABiocTraining
+RUN sh /home/rstudio/HCABiocTraining/docker/install_me.sh
+RUN Rscript /home/rstudio/HCABiocTraining/docker/install_me.R
 
-RUN echo "RETICULATE_PYTHON_ENV=/home/rstudio/.virtualenvs/r-reticulate" >> "/home/rstudio/.Renviron"
-
-RUN Rscript /home/rstudio/src/HCABiocTraining/install.R
-
-USER root
+RUN echo "RETICULATE_PYTHON_ENV=/opt/venv/anndata" >> "${R_HOME}/etc/Renviron.site"
