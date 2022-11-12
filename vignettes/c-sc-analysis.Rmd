@@ -120,7 +120,73 @@ h5ad[, result$colname]
 
 ## Gene Sets
 
-## Psuedo-Bulk Differential Expression
+The single cell assay detected expression of `r nrow(h5ad)` genes, but
+we may often be interested in only a set of these. Such gene sets
+might be defined by our own research interests, or may be defined as
+'community standards'.
+
+Check out [MSigDB][] -- a collection of gene sets! Focus on the
+Halmarks of Cancer gene sets 'H: hallmark gene sets'.  **NOTE** MSigDB
+requires registration, which is triggered by downloading a gene set
+manually; do that first, even though we use automatically downloaded
+gene sets.
+
+The helper function `training_hallmarks()` downloads the 'Hallmarks of
+Cancer' gene sets from MSigDb, translating the 'Entrez' gene
+identifiers in the gene sets to the 'Ensembl' identifiers
+(`rownames(h5ad)`) in our data.
+
+```{r}
+hallmarks <- training_hallmarks()
+hallmarks
+
+## gene sets and their counts
+hallmarks |> dplyr::count(set) |> DT::datatable()
+```
+
+Suppose we are interested in the `HALLMARK_P53_PATHWAY` gene set
+
+```{r}
+p53_gene_set <-
+    hallmarks |>
+    filter(set == "HALLMARK_P53_PATHWAY")
+nrow(p53_gene_set)
+```
+
+We can create a subset of our data with just these genes (some
+identifiers in `p53_gene_set` are not present in our observed data...)
+
+```{r}
+p53_rows <- rownames(h5ad) %in% pull(p53_gene_set, "gene")
+h5ad_p53 <- h5ad[p53_rows,]
+h5ad_p53
+```
+
+It is then easy to visualize the UMAP of this subset of genes, or
+perform addditional analyses.
+
+```{r}
+## UMAP coordinate. N.B., this is taking a subset of the UMAP
+## coordinates computed on all genes, not re-calculating a UMAP on the
+## P53 gene set.
+umap_p53 <-
+    as_tibble(reducedDim(h5ad_p53, "X_umap")) |>
+    bind_cols(
+        cell_type = h5ad_p53$cell_type,
+        donor_id = h5ad_p53$donor_id,
+        self_reported_ethnicity = h5ad_p53$self_reported_ethnicity,
+        colname = colnames(h5ad_p53) # unique identifier
+    )
+
+plot_ly(
+    umap_p53,
+    x = ~ V1, y =  ~ V2, color = ~ cell_type,
+    type = "scatter", mode = "markers", opacity = .5,
+    marker = list(symbol = "circle-open", line = list(width = 1))
+)
+```
+
+[MSigDB]: https://www.gsea-msigdb.org/gsea/msigdb/
 
 # Essential Steps
 
