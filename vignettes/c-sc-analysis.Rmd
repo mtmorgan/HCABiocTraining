@@ -26,15 +26,7 @@ library(ggplot2)
 library(plotly)
 ```
 
-# Exploring Pre-computed Data
-
-We illustrate these steps with data from CELLxGENE retrieved in the
-previous article. For our own data we would need to proceed from a
-simple count matrix produced by Cell Ranger (etc.) through careful
-quality control, normalization, data integration / batch coorrection,
-etc., as illustrated in a subsequent section.
-
-## Data retrieval
+# Data retrieval
 
 The following is an abbreviated version of the steps illustrated in
 the previous article.
@@ -52,14 +44,121 @@ h5ad_file <-
 
 ## import into R as a SingleCellExperiment
 h5ad <- training_read_h5ad_as_sce(h5ad_file)
+```
 
+# Essential Steps
+
+Based on [Orchestrating Single-Cell Analysis with Bioconductor][OSCA].
+
+[OSCA]: http://bioconductor.org/books/3.16/OSCA.basic/
+
+## Normalization
+
+## Feature Selection
+
+## Dimensionality Reduction
+
+## Cell Type Annotation
+
+# Exploring Pre-computed Data
+
+We illustrate these steps with data from CELLxGENE retrieved in the
+previous article. For our own data we would need to proceed from a
+simple count matrix produced by Cell Ranger (etc.) through careful
+quality control, normalization, data integration / batch coorrection,
+etc., as illustrated in a subsequent section.
+
+## Basic Manipulation
+
+Displaying the `SingleCellExperiment`...
+
+```{r}
 h5ad
 ```
 
+...suggests the data available and how to access it -- there are `r
+nrow(h5ad)` genes and `r ncol(h5ad)` cells. The 'raw' data include
+counts `assays(h5ad, "counts")` and log counts (actuall `log(1 +
+couunts)`), etc.
+
+For instance, the cell (column) annotations are easily
+accessible and summarized as
+
+```{r}
+colData(h5ad) |>
+    as_tibble()
+
+colData(h5ad) |>
+    as_tibble() |>
+    group_by(donor_id, self_reported_ethnicity) |>
+    dplyr::count()
+
+colData(h5ad) |>
+    as_tibble() |>
+    dplyr::count(cell_type, sort = TRUE)
+```
+
+Many common operations have been standardized in a number of
+_Bioconductor_ packages. For instance, use functionality from the
+[scater][] package to visualize the UMAP present in the object,
+coloring by the `cell_type` column data annotation.
+
+```{r}
+scater::plotReducedDim(h5ad, "X_umap", color_by = "cell_type")
+```
+
+[scater]: https://bioconductor.org/packages/scater
+
+One can also work with the data more directly, e.g., to plot the
+distribution of reads per cell...
+
+```{r}
+reads_per_cell <-
+    h5ad |>
+    ## retrieve the matrix of gene x cell counts
+    assay("counts", withDimnames = FALSE) |>
+    ## calculate the column sums, i.e., reads mapped to each cell
+    colSums()
+
+hist(log10(reads_per_cell))
+```
+
+...or to remove genes with non-zero counts
+
+```{r}
+reads_per_gene <-
+    h5ad |>
+    assay("counts", withDimnames = FALSE) |>
+    rowSums()
+
+table(reads_per_gene != 0)
+
+h5ad[reads_per_gene != 0,]
+```
+
+It's also very easy to find out information about the samples included
+in the study, e.g., the individual donors, their ethnicty, and family
+history of breast cancer (the specific information available depends
+on the data submitted by the original investigator).
+
+```{r}
+SingleCellExperiment::colData(h5ad) |>
+    as_tibble() |>
+    dplyr::count(
+        donor_id, self_reported_ethnicity, family_history_breast_cancer
+    )
+```
+
+Glancing at this table, we see that there is little replication that
+does not have serious confounding factors.
+
 ## Visualization
 
-The previous article created a static visualization from the 'UMAP'
-reduced dimension representation. First load [ggplot2][]
+The previous section created a static visualization from the 'UMAP'
+reduced dimension representation using `scater::plotReducedDim()`:
+
+It can be helpful to do this 'by hand' to illustrate how one can work
+directly with SingleCellExperiment objects. First load [ggplot2][]
 
 [ggplot2]: https://cran.r-project.org/package=ggplot2
 
@@ -187,17 +286,3 @@ plot_ly(
 ```
 
 [MSigDB]: https://www.gsea-msigdb.org/gsea/msigdb/
-
-# Essential Steps
-
-Based on [Orchestrating Single-Cell Analysis with Bioconductor][OSCA].
-
-[OSCA]: http://bioconductor.org/books/3.16/OSCA.basic/
-
-## Normalization
-
-## Feature Selection
-
-## Dimensionality Reduction
-
-## Cell Type Annotation

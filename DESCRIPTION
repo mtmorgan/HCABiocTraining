@@ -1,7 +1,7 @@
 Package: HCABiocTraining
 Title: Introduction to Human Cell Atlas Data Access & Analysis in R /
     Bioconductor
-Version: 0.0.6
+Version: 0.0.7
 Authors@R:
     person(
         "Martin", "Morgan",
@@ -16,7 +16,7 @@ Encoding: UTF-8
 Imports: Matrix, anndata, rjsoncons, jsonlite, SingleCellExperiment,
     cellxgenedp, BiocFileCache, org.Hs.eg.db, AnnotationDbi,
     dplyr, tidyr, plotly, shiny, miniUI
-Suggests: ggplot2, hca, Seurat, knitr, rmarkdown, DT
+Suggests: ggplot2, hca, Seurat, scater, DT, knitr, rmarkdown
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.2
 URL: https://mtmorgan.github.io/HCABiocTraining

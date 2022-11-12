@@ -215,59 +215,35 @@ The downloaded file is cached, so the next time access is fast.
 
 ## *SingleCellExperiment*
 
-Easy to work with reduced-dimension data...
+The `SingleCellExperiment` is used to represent 'rectangular' single
+cell expression and other data in _R_ / _Bioconductor_. It coordinates
+a gene x cell count matricies (`assays()`) with annotations on the
+genes (`rowData()`) and columns (`cellData()`), and with
+reduced-dimension summaries.
+
+Usually, an effective way to represent the `.h5ad` data as a
+`SingleCellExperiment` is using `zellkonverter::readH5AD()`. Recent
+updates to the `.h5ad` file format have unfortunately broken that
+function; it will likely be fixed in a timely manner. Instead, we use
+the helper function `training_read_h5ad_as_sce()` to load the data
 
 ```{r}
 h5ad <- training_read_h5ad_as_sce(h5ad_file)
+```
+
+Displaying the object...
+
+```{r}
 h5ad
-
-umap <- as_tibble(reducedDim(h5ad, "X_umap"))
-
-ggplot(umap) +
-    aes(x = V1, y = V2, color = h5ad$cell_type) +
-    geom_point(pch = ".")
 ```
 
-...but also counts data, e.g., distribution of reads per cell
+...suggests the data available and how to access it -- there are 
+`r nrow(h5ad)` genes and `r ncol(h5ad)` cells. The 'raw' data include
+counts `assays(h5ad, "counts")` and log counts (actuall `log(1 +
+couunts)`), etc.
 
-```{r}
-reads_per_cell <-
-    h5ad |>
-    ## retrieve the matrix of gene x cell counts
-    assay() |>
-    ## calculate the column sums, i.e., reads mapped to each cell
-    colSums()
-
-hist(log10(reads_per_cell))
-```
-
-...or to remove genes with non-zero counts
-
-```{r}
-reads_per_gene <-
-    h5ad |>
-    assay() |>
-    rowSums()
-
-table(reads_per_gene != 0)
-h5ad[reads_per_gene != 0,]
-```
-
-It's also very easy to find out information about the samples included
-in the study, e.g., the individual donors, their ethnicty, and family
-history of breast cancer (the specific information available depends
-on the data submitted by the original investigator).
-
-```{r}
-SingleCellExperiment::colData(h5ad) |>
-    as_tibble() |>
-    dplyr::count(
-        donor_id, self_reported_ethnicity, family_history_breast_cancer
-    )
-```
-
-Glancing at this table, we see that there is little replication that
-does not have serious confounding factors.
+Working with `SingleCellExperiment` objects is described in additional
+detail in the next article.
 
 ## *Seurat*
 
