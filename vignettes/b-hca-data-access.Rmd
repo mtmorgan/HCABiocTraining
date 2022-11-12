@@ -217,7 +217,7 @@ The downloaded file is cached, so the next time access is fast.
 
 The `SingleCellExperiment` is used to represent 'rectangular' single
 cell expression and other data in _R_ / _Bioconductor_. It coordinates
-a gene x cell count matricies (`assays()`) with annotations on the
+a gene x cell count matricies (`assay()`) with annotations on the
 genes (`rowData()`) and columns (`cellData()`), and with
 reduced-dimension summaries.
 
@@ -237,10 +237,10 @@ Displaying the object...
 h5ad
 ```
 
-...suggests the data available and how to access it -- there are 
-`r nrow(h5ad)` genes and `r ncol(h5ad)` cells. The 'raw' data include
-counts `assays(h5ad, "counts")` and log counts (actuall `log(1 +
-couunts)`), etc.
+...suggests the data available and how to access it -- there are `r
+nrow(h5ad)` genes and `r ncol(h5ad)` cells. The 'raw' data include
+counts `assays(h5ad, "counts")`, annotations on each gene
+(`rowData()`) and cell (`colData()`), etc...
 
 Working with `SingleCellExperiment` objects is described in additional
 detail in the next article.

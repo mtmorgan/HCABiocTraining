@@ -76,10 +76,11 @@ Displaying the `SingleCellExperiment`...
 h5ad
 ```
 
-...suggests the data available and how to access it -- there are `r
-nrow(h5ad)` genes and `r ncol(h5ad)` cells. The 'raw' data include
-counts `assays(h5ad, "counts")` and log counts (actuall `log(1 +
-couunts)`), etc.
+...suggests the data available and how to access it -- there are 
+`r nrow(h5ad)` genes and `r ncol(h5ad)` cells. The 'raw' data include
+a gene x cell count matricies (`assay()`) with annotations on the
+genes (`rowData()`) and columns (`cellData()`), and with
+reduced-dimension summaries.
 
 For instance, the cell (column) annotations are easily
 accessible and summarized as

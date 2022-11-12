@@ -23,8 +23,9 @@ training_read_h5ad_as_sce <-
     h5ad <- read_h5ad(h5ad_file_path)
     SingleCellExperiment(
         assays = list(
-            counts = Matrix::t(h5ad$X),
-            logcounts = log1p(Matrix::t(h5ad$X))
+            counts = Matrix::t(h5ad$X)
+            ## too much memory for github actions
+            ## logcounts = log1p(Matrix::t(h5ad$X))
         ),
         colData = h5ad$obs, rowData = h5ad$var,
         metadata = h5ad$uns,
