@@ -119,7 +119,7 @@
 <p>Functions</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span>        <span class="co"># 5 random normal deviates</span></span>
-<span><span class="co">## [1] -1.1156008 -1.0540015 -0.6111153  1.9496268 -0.3425764</span></span>
+<span><span class="co">## [1]  0.294985 -0.939354 -1.496030 -1.469663 -1.363068</span></span>
 <span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span> <span class="co"># 100 random normal deviates</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>         <span class="co"># histogram, approximately normal</span></span></code></pre></div>
 <p><img src="a-intro-to-r_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
@@ -139,7 +139,7 @@ explicit ‘for’ loop</p>
 <span><span class="co">## </span></span>
 <span><span class="co">## Coefficients:</span></span>
 <span><span class="co">## (Intercept)            x  </span></span>
-<span><span class="co">##       0.111        1.065</span></span>
+<span><span class="co">##     0.06332      0.92588</span></span>
 <span>            <span class="co"># regression of y on x</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="co"># plot points and fitted regression line</span></span></code></pre></div>
 <p><img src="a-intro-to-r_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
@@ -148,9 +148,9 @@ explicit ‘for’ loop</p>
 <span><span class="co">## Analysis of Variance Table</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Response: y</span></span>
-<span><span class="co">##           Df  Sum Sq Mean Sq F value    Pr(&gt;F)    </span></span>
-<span><span class="co">## x          1 120.914 120.914  134.93 &lt; 2.2e-16 ***</span></span>
-<span><span class="co">## Residuals 98  87.819   0.896                      </span></span>
+<span><span class="co">##           Df Sum Sq Mean Sq F value   Pr(&gt;F)    </span></span>
+<span><span class="co">## x          1 75.366  75.366  74.233 1.21e-13 ***</span></span>
+<span><span class="co">## Residuals 98 99.496   1.015                     </span></span>
 <span><span class="co">## ---</span></span>
 <span><span class="co">## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 <p>Write your own functions</p>
@@ -183,7 +183,7 @@ distribution…</p>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.sleep.html" class="external-link">Sys.sleep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.003   0.000   8.010</span></span>
+<span><span class="co">##   0.002   0.000   8.011</span></span>
 <span></span>
 <span><span class="co">## sleep in parallel -- takes only 2 seconds</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">parallel</span><span class="op">)</span></span>
@@ -192,7 +192,7 @@ distribution…</p>
 <span>    <span class="fu"><a href="https://rdrr.io/r/parallel/clusterApply.html" class="external-link">parLapply</a></span><span class="op">(</span><span class="va">cl</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">8</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.sleep.html" class="external-link">Sys.sleep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.002   0.000   2.096</span></span></code></pre></div>
+<span><span class="co">##   0.002   0.000   2.083</span></span></code></pre></div>
 <p>…or contributed, e.g., <a href="https://cran.r-project.org/package=dplyr" class="external-link">dplyr</a> to introduce
 the ‘tidyverse’</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
@@ -207,18 +207,18 @@ the ‘tidyverse’</p>
 <span><span class="co">## e.g., only displays the first 10 rows</span></span>
 <span><span class="va">tbl</span></span>
 <span><span class="co">## <span style="color: #949494;"># A tibble: 100 × 2</span></span></span>
-<span><span class="co">##           x        y</span></span>
-<span><span class="co">##       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>  0.118   -<span style="color: #BB0000;">0.376</span>  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>  1.18     0.977  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>  1.63     0.746  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>  0.005<span style="text-decoration: underline;">58</span> -<span style="color: #BB0000;">1.04</span>   </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> -<span style="color: #BB0000;">0.455</span>   -<span style="color: #BB0000;">2.23</span>   </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> -<span style="color: #BB0000;">0.324</span>   -<span style="color: #BB0000;">1.77</span>   </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> -<span style="color: #BB0000;">0.464</span>   -<span style="color: #BB0000;">1.22</span>   </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>  1.00     2.13   </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  0.385   -<span style="color: #BB0000;">0.059</span><span style="color: #BB0000; text-decoration: underline;">0</span> </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>  1.54    -<span style="color: #BB0000;">0.007</span><span style="color: #BB0000; text-decoration: underline;">97</span></span></span>
+<span><span class="co">##         x      y</span></span>
+<span><span class="co">##     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>  0.849  0.424</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>  0.315 -<span style="color: #BB0000;">1.30</span> </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>  0.128 -<span style="color: #BB0000;">1.69</span> </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>  0.396  0.469</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> -<span style="color: #BB0000;">0.315</span>  1.57 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> -<span style="color: #BB0000;">1.83</span>   0.178</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>  0.817  2.30 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> -<span style="color: #BB0000;">0.945</span> -<span style="color: #BB0000;">2.49</span> </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  1.19   0.572</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> -<span style="color: #BB0000;">0.395</span> -<span style="color: #BB0000;">1.79</span> </span></span>
 <span><span class="co">## <span style="color: #949494;"># … with 90 more rows</span></span></span></code></pre></div>
 <p>The tidyverse makes use of ‘pipes’ <code>|&gt;</code>. A pipe takes
 the left-hand side and pass through to the right-hand side. Key <a href="https://cran.r-project.org/package=dplyr" class="external-link">dplyr</a> ‘verbs’ can be
@@ -231,20 +231,20 @@ piped together: <code><a href="https://dplyr.tidyverse.org/reference/filter.html
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;</span> <span class="fl">0</span>, <span class="va">y</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="co">## add a column</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>distance_from_origin <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">y</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">## <span style="color: #949494;"># A tibble: 30 × 3</span></span></span>
-<span><span class="co">##         x     y distance_from_origin</span></span>
-<span><span class="co">##     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> 1.18   0.977                1.53 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> 1.63   0.746                1.80 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> 1.00   2.13                 2.35 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> 1.58   1.26                 2.02 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> 1.13   0.825                1.40 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> 0.423  0.260                0.497</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> 0.752  1.12                 1.35 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> 0.204  0.607                0.640</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> 0.407  0.920                1.01 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> 0.083<span style="text-decoration: underline;">7</span> 0.727                0.732</span></span>
-<span><span class="co">## <span style="color: #949494;"># … with 20 more rows</span></span></span></code></pre></div>
+<span><span class="co">## <span style="color: #949494;"># A tibble: 37 × 3</span></span></span>
+<span><span class="co">##         x      y distance_from_origin</span></span>
+<span><span class="co">##     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> 0.849  0.424                 0.949</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> 0.396  0.469                 0.614</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> 0.817  2.30                  2.44 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> 1.19   0.572                 1.32 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> 0.209  0.425                 0.474</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> 0.771  0.094<span style="text-decoration: underline;">3</span>                0.777</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> 0.486  0.695                 0.848</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> 0.578  1.89                  1.98 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> 1.27   1.02                  1.63 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> 0.047<span style="text-decoration: underline;">8</span> 0.155                 0.162</span></span>
+<span><span class="co">## <span style="color: #949494;"># … with 27 more rows</span></span></span></code></pre></div>
 <p>Another example: <a href="https://cran.r-project.org/package=ggplot2" class="external-link">ggplot2</a> for
 visualization</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
