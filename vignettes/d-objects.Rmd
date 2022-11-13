@@ -1,0 +1,286 @@
+---
+title: "D. Working Directly with Data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{D. Working Directly with Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
+This article explores more direct manipulation of single cell
+objects. Direct manipulation can be important for both routine (e.g.,
+creating a subset of data based on gene set membership) or advanced
+(e.g., implementing a new analysis method) tasks. The focus is on
+_Bioconductor_'s `SingleCellExperiment` object becuase of the rich
+supporting infastructure (e.g., annotation resources) within
+_Bioconductor_; similar operations can also be accomplished with the
+Seurat object.
+
+We start by loading packages we'll use today.
+
+```{r setup, message = FALSE}
+library(HCABiocTraining)
+
+## data access
+library(cellxgenedp)
+
+## single cell data representation in R
+library(SingleCellExperiment) # Bioconductor representation
+
+## general programming tools
+library(dplyr)
+library(ggplot2)
+library(plotly)
+```
+
+# Data retrieval
+
+The following is an abbreviated version of the steps illustrated in
+the previous article.
+
+```{r}
+## use a known dataset ID, discovered previously..
+dataset <- "de985818-285f-4f59-9dbd-d74968fddba3"
+training_cxg_dataset(dataset)
+
+## download (or retieve from the local cache) the file
+h5ad_file <-
+    files() |>
+    dplyr::filter(filetype == "H5AD", dataset_id == dataset) |>
+    files_download(dry.run = FALSE)
+
+## import into R as a SingleCellExperiment
+h5ad <- training_read_h5ad_as_sce(h5ad_file)
+```
+
+# Exploring Pre-computed Data
+
+We illustrate these steps with data from CELLxGENE retrieved in the
+previous article. For our own data we would need to proceed from a
+simple count matrix produced by Cell Ranger (etc.) through careful
+quality control, normalization, data integration / batch coorrection,
+etc., as illustrated in a subsequent section.
+
+## Basic Manipulation
+
+Displaying the `SingleCellExperiment`...
+
+```{r}
+h5ad
+```
+
+...suggests the data available and how to access it -- there are 
+`r nrow(h5ad)` genes and `r ncol(h5ad)` cells. The 'raw' data include
+a gene x cell count matricies (`assay()`) with annotations on the
+genes (`rowData()`) and columns (`cellData()`), and with
+reduced-dimension summaries.
+
+For instance, the cell (column) annotations are easily
+accessible and summarized as
+
+```{r}
+colData(h5ad) |>
+    as_tibble()
+
+colData(h5ad) |>
+    as_tibble() |>
+    group_by(donor_id, self_reported_ethnicity) |>
+    dplyr::count()
+
+colData(h5ad) |>
+    as_tibble() |>
+    dplyr::count(cell_type, sort = TRUE)
+```
+
+Many common operations have been standardized in a number of
+_Bioconductor_ packages. For instance, use functionality from the
+[scater][] package to visualize the UMAP present in the object,
+coloring by the `cell_type` column data annotation.
+
+```{r}
+scater::plotReducedDim(h5ad, "X_umap", color_by = "cell_type")
+```
+
+[scater]: https://bioconductor.org/packages/scater
+
+One can also work with the data more directly, e.g., to plot the
+distribution of reads per cell...
+
+```{r}
+reads_per_cell <-
+    h5ad |>
+    ## retrieve the matrix of gene x cell counts
+    assay("counts", withDimnames = FALSE) |>
+    ## calculate the column sums, i.e., reads mapped to each cell
+    colSums()
+
+hist(log10(reads_per_cell))
+```
+
+...or to remove genes with non-zero counts
+
+```{r}
+reads_per_gene <-
+    h5ad |>
+    assay("counts", withDimnames = FALSE) |>
+    rowSums()
+
+table(reads_per_gene != 0)
+
+h5ad[reads_per_gene != 0,]
+```
+
+It's also very easy to find out information about the samples included
+in the study, e.g., the individual donors, their ethnicty, and family
+history of breast cancer (the specific information available depends
+on the data submitted by the original investigator).
+
+```{r}
+SingleCellExperiment::colData(h5ad) |>
+    as_tibble() |>
+    dplyr::count(
+        donor_id, self_reported_ethnicity, family_history_breast_cancer
+    )
+```
+
+Glancing at this table, we see that there is little replication that
+does not have serious confounding factors.
+
+## Visualization
+
+The previous section created a static visualization from the 'UMAP'
+reduced dimension representation using `scater::plotReducedDim()`:
+
+It can be helpful to do this 'by hand' to illustrate how one can work
+directly with SingleCellExperiment objects. First load [ggplot2][]
+
+[ggplot2]: https://cran.r-project.org/package=ggplot2
+
+```{r}
+library(ggplot2)
+```
+
+Then create a tibble containing information about the UMAP, as well as
+cell (column) annotations
+
+```{r}
+umap <-
+    as_tibble(reducedDim(h5ad, "X_umap")) |>
+    bind_cols(
+        cell_type = h5ad$cell_type,
+        donor_id = h5ad$donor_id,
+        self_reported_ethnicity = h5ad$self_reported_ethnicity,
+        colname = colnames(h5ad) # unique identifier
+    )
+```
+
+Visualize the two-dimensional UMAP summary, coloring by cell type
+
+```{r}
+ggplot(umap) +
+    aes(x = V1, y = V2, color = cell_type) +
+    geom_point(pch = ".")
+```
+
+The [plotly][] package provides a very convenient way to make this an
+interactive plot
+
+[plotly]: https://cran.r-project.org/package=plotly
+
+```{r}
+library(plotly)
+
+plot_ly(
+    umap,
+    x = ~ V1, y =  ~ V2, color = ~ cell_type,
+    type = "scatter", mode = "markers", opacity = .8,
+    marker = list(symbol = "circle-open", line = list(width = 1))
+)
+```
+
+A suprisingly straight-forward (but admittedly advanced) helper
+function uses [shiny][] to allows us to write an application to select
+data we are interested in... check it out!
+
+[shiny]: https://cran.r-project.org/package=shiny
+
+```{r, eval = FALSE}
+result <- training_cell_viewer(umap) # select some cells of interest
+result
+## subset the SingleCellExperiment to just those cells
+h5ad[, result$colname]
+```
+
+## Gene Sets
+
+The single cell assay detected expression of `r nrow(h5ad)` genes, but
+we may often be interested in only a set of these. Such gene sets
+might be defined by our own research interests, or may be defined as
+'community standards'.
+
+Check out [MSigDB][] -- a collection of gene sets! Focus on the
+Halmarks of Cancer gene sets 'H: hallmark gene sets'.  **NOTE** MSigDB
+requires registration, which is triggered by downloading a gene set
+manually; do that first, even though we use automatically downloaded
+gene sets.
+
+The helper function `training_hallmarks()` downloads the 'Hallmarks of
+Cancer' gene sets from MSigDb, translating the 'Entrez' gene
+identifiers in the gene sets to the 'Ensembl' identifiers
+(`rownames(h5ad)`) in our data.
+
+```{r}
+hallmarks <- training_hallmarks()
+hallmarks
+
+## gene sets and their counts
+hallmarks |> dplyr::count(set) |> DT::datatable()
+```
+
+Suppose we are interested in the `HALLMARK_P53_PATHWAY` gene set
+
+```{r}
+p53_gene_set <-
+    hallmarks |>
+    filter(set == "HALLMARK_P53_PATHWAY")
+nrow(p53_gene_set)
+```
+
+We can create a subset of our data with just these genes (some
+identifiers in `p53_gene_set` are not present in our observed data...)
+
+```{r}
+p53_rows <- rownames(h5ad) %in% pull(p53_gene_set, "gene")
+h5ad_p53 <- h5ad[p53_rows,]
+h5ad_p53
+```
+
+It is then easy to visualize the UMAP of this subset of genes, or
+perform addditional analyses.
+
+```{r}
+## UMAP coordinate. N.B., this is taking a subset of the UMAP
+## coordinates computed on all genes, not re-calculating a UMAP on the
+## P53 gene set.
+umap_p53 <-
+    as_tibble(reducedDim(h5ad_p53, "X_umap")) |>
+    bind_cols(
+        cell_type = h5ad_p53$cell_type,
+        donor_id = h5ad_p53$donor_id,
+        self_reported_ethnicity = h5ad_p53$self_reported_ethnicity,
+        colname = colnames(h5ad_p53) # unique identifier
+    )
+
+plot_ly(
+    umap_p53,
+    x = ~ V1, y =  ~ V2, color = ~ cell_type,
+    type = "scatter", mode = "markers", opacity = .8,
+    marker = list(symbol = "circle-open", line = list(width = 1))
+)
+```
+
+[MSigDB]: https://www.gsea-msigdb.org/gsea/msigdb/

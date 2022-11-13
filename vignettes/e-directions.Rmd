@@ -1,8 +1,8 @@
 ---
-title: "D. Prospects for Spatial and Extended Analysis"
+title: "E. Spatial, Multi-Modal and Extended Analysis"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{D. Prospects for Spatial and Extended Analysis}
+  %\VignetteIndexEntry{E. Spatial, Multi-Modal and Extended Analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

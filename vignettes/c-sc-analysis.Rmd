@@ -11,279 +11,182 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
+In the previous article we saw how to make HCA / CELLxGENE data
+available as `SingleCellExperiment` or `Seuart` objects. From here
+there are rich, well-documented workflows for subsequent
+analysis. We'll point to these resources and outline overall
+workflows, but will only perform illustrative calculations.
+
+Some steps require both computing time and resources that aren't
+suitable for workshop presentation so we focus on a 'classic' data
+set, the 10x Genomics Peripheral Blood Mononuclear Cells (PBMC)
+dataset conssists of 2,700 cells. Analysis of data sets with say
+50,000 cells might require 32- or 64 GB of memory and take up to an
+hour for an end-to-end analysis; one way to access a computer with the
+much memory might be through a commercial (Google, Azure, AWS) cloud,
+or on a research network like the [AnVIL][] computational cloud.
+
+[AnVIL]: https://anvilproject.org
+
 ```{r setup, message = FALSE}
-library(HCABiocTraining)
-
-## data access
-library(cellxgenedp)
-
-## single cell data representation in R
-library(SingleCellExperiment) # Bioconductor representation
-
-## general programming tools
-library(dplyr)
-library(ggplot2)
-library(plotly)
 ```
 
-# Data retrieval
+# _Seurat_
 
-The following is an abbreviated version of the steps illustrated in
-the previous article.
+Based on [Getting Started with Seurat][] and the [Seurat - Guided
+Clustering Tutorial][Seurat tutorial]. The guided tutorial covers
+
+- Data input
+- Quality Control
+- Normalization
+- Identification of highly variable features
+- Scaling the data
+- Linear dimensional reduction
+- Clusters
+- Non-linear dimensional reduction (e.g., UMAP)
+- Differential expression
+- Cell type assignment
+
+To illustrating working with `Seurat`, we take the first few steps
+through this workflow.
+
+## Workflow
+
+Here we re-capitulate some of the initial steps in the [Seurat
+tutorial][].
+
+Data retrieval. Here we retrieve the raw data to a local cache. It is
+distributed as a compressed 'tar' archive, so we `untar()` it to a
+temporary location.
 
 ```{r}
-## use a known dataset ID, discovered previously..
-dataset <- "de985818-285f-4f59-9dbd-d74968fddba3"
-training_cxg_dataset(dataset)
+## download to local cache
+url <- paste0(
+    "https://cf.10xgenomics.com/samples/cell/pbmc3k/",
+    "pbmc3k_filtered_gene_bc_matrices.tar.gz"
+)
+pbmc3k_tar_gz <- BiocFileCache::bfcrpath(rname = url)
 
-## download (or retieve from the local cache) the file
-h5ad_file <-
-    files() |>
-    dplyr::filter(filetype == "H5AD", dataset_id == dataset) |>
-    files_download(dry.run = FALSE)
+## 'untar' to a temporary location
+pbmc3k_directory <- tempfile()
+untar(pbmc3k_tar_gz, exdir = pbmc3k_directory)
 
-## import into R as a SingleCellExperiment
-h5ad <- training_read_h5ad_as_sce(h5ad_file)
+## location of the relevant data
+pbmc3k_data_dir <-
+    file.path(pbmc3k_directory, "filtered_gene_bc_matrices", "hg19")
 ```
 
-# Essential Steps
-
-Based on [Orchestrating Single-Cell Analysis with Bioconductor][OSCA].
-
-[OSCA]: http://bioconductor.org/books/3.16/OSCA.basic/
-
-## Normalization
-
-## Feature Selection
-
-## Dimensionality Reduction
-
-## Cell Type Annotation
-
-# Exploring Pre-computed Data
-
-We illustrate these steps with data from CELLxGENE retrieved in the
-previous article. For our own data we would need to proceed from a
-simple count matrix produced by Cell Ranger (etc.) through careful
-quality control, normalization, data integration / batch coorrection,
-etc., as illustrated in a subsequent section.
-
-## Basic Manipulation
-
-Displaying the `SingleCellExperiment`...
+Following the [Seurat tutorial][], we read the data into a sparse
+matrix, and then into a Seurat object.
 
 ```{r}
-h5ad
+library(Seurat)
+
+## read the 10x data as a sparse matrix
+pbmc.data <- Read10X(data.dir = pbmc3k_data_dir)
+
+class(pbmc.data)
+
+dim(pbmc.data) # 32738 features (genes) x 2700 samples (cells)
+
+## create a Seurat object from the count matrix
+pbmc <- CreateSeuratObject(
+    counts = pbmc.data,
+    project = "pbmc3k",
+    ## filter some features (present in less than 3 cells) and cells
+    ## (fewer than 200 features)
+    min.cells = 3, min.features = 200
+)
+
+pbmc # 13714 features x 2700 samples
+
+pbmc[["RNA"]]
 ```
 
-...suggests the data available and how to access it -- there are 
-`r nrow(h5ad)` genes and `r ncol(h5ad)` cells. The 'raw' data include
-a gene x cell count matricies (`assay()`) with annotations on the
-genes (`rowData()`) and columns (`cellData()`), and with
-reduced-dimension summaries.
-
-For instance, the cell (column) annotations are easily
-accessible and summarized as
+The first step in the workflow is to perform quality control. Start by
+identifying the mitochondrial genes. In this particular example,
+mitchondrial genes are annotated based on the feature name.
 
 ```{r}
-colData(h5ad) |>
-    as_tibble()
-
-colData(h5ad) |>
-    as_tibble() |>
-    group_by(donor_id, self_reported_ethnicity) |>
-    dplyr::count()
-
-colData(h5ad) |>
-    as_tibble() |>
-    dplyr::count(cell_type, sort = TRUE)
+## The [[ operator can add columns to object metadata. This is a great
+## place to stash QC stats
+pbmc[["percent.mt"]] <- PercentageFeatureSet(pbmc, pattern = "^MT-")
 ```
 
-Many common operations have been standardized in a number of
-_Bioconductor_ packages. For instance, use functionality from the
-[scater][] package to visualize the UMAP present in the object,
-coloring by the `cell_type` column data annotation.
+Visualize some metrics...
 
 ```{r}
-scater::plotReducedDim(h5ad, "X_umap", color_by = "cell_type")
-```
-
-[scater]: https://bioconductor.org/packages/scater
-
-One can also work with the data more directly, e.g., to plot the
-distribution of reads per cell...
-
-```{r}
-reads_per_cell <-
-    h5ad |>
-    ## retrieve the matrix of gene x cell counts
-    assay("counts", withDimnames = FALSE) |>
-    ## calculate the column sums, i.e., reads mapped to each cell
-    colSums()
-
-hist(log10(reads_per_cell))
-```
-
-...or to remove genes with non-zero counts
-
-```{r}
-reads_per_gene <-
-    h5ad |>
-    assay("counts", withDimnames = FALSE) |>
-    rowSums()
-
-table(reads_per_gene != 0)
-
-h5ad[reads_per_gene != 0,]
-```
-
-It's also very easy to find out information about the samples included
-in the study, e.g., the individual donors, their ethnicty, and family
-history of breast cancer (the specific information available depends
-on the data submitted by the original investigator).
-
-```{r}
-SingleCellExperiment::colData(h5ad) |>
-    as_tibble() |>
-    dplyr::count(
-        donor_id, self_reported_ethnicity, family_history_breast_cancer
-    )
-```
-
-Glancing at this table, we see that there is little replication that
-does not have serious confounding factors.
-
-## Visualization
-
-The previous section created a static visualization from the 'UMAP'
-reduced dimension representation using `scater::plotReducedDim()`:
-
-It can be helpful to do this 'by hand' to illustrate how one can work
-directly with SingleCellExperiment objects. First load [ggplot2][]
-
-[ggplot2]: https://cran.r-project.org/package=ggplot2
-
-```{r}
-library(ggplot2)
-```
-
-Then create a tibble containing information about the UMAP, as well as
-cell (column) annotations
-
-```{r}
-umap <-
-    as_tibble(reducedDim(h5ad, "X_umap")) |>
-    bind_cols(
-        cell_type = h5ad$cell_type,
-        donor_id = h5ad$donor_id,
-        self_reported_ethnicity = h5ad$self_reported_ethnicity,
-        colname = colnames(h5ad) # unique identifier
-    )
-```
-
-Visualize the two-dimensional UMAP summary, coloring by cell type
-
-```{r}
-ggplot(umap) +
-    aes(x = V1, y = V2, color = cell_type) +
-    geom_point(pch = ".")
-```
-
-The [plotly][] package provides a very convenient way to make this an
-interactive plot
-
-[plotly]: https://cran.r-project.org/package=plotly
-
-```{r}
-library(plotly)
-
-plot_ly(
-    umap,
-    x = ~ V1, y =  ~ V2, color = ~ cell_type,
-    type = "scatter", mode = "markers", opacity = .5,
-    marker = list(symbol = "circle-open", line = list(width = 1))
+VlnPlot(
+    pbmc,
+    features = c("nFeature_RNA", "nCount_RNA", "percent.mt"),
+    ncol = 3
 )
 ```
 
-A suprisingly straight-forward (but admittedly advanced) helper
-function uses [shiny][] to allows us to write an application to select
-data we are interested in... check it out!
-
-[shiny]: https://cran.r-project.org/package=shiny
-
-```{r, eval = FALSE}
-result <- training_cell_viewer(umap) # select some cells of interest
-result
-## subset the SingleCellExperiment to just those cells
-h5ad[, result$colname]
-```
-
-## Gene Sets
-
-The single cell assay detected expression of `r nrow(h5ad)` genes, but
-we may often be interested in only a set of these. Such gene sets
-might be defined by our own research interests, or may be defined as
-'community standards'.
-
-Check out [MSigDB][] -- a collection of gene sets! Focus on the
-Halmarks of Cancer gene sets 'H: hallmark gene sets'.  **NOTE** MSigDB
-requires registration, which is triggered by downloading a gene set
-manually; do that first, even though we use automatically downloaded
-gene sets.
-
-The helper function `training_hallmarks()` downloads the 'Hallmarks of
-Cancer' gene sets from MSigDb, translating the 'Entrez' gene
-identifiers in the gene sets to the 'Ensembl' identifiers
-(`rownames(h5ad)`) in our data.
+...and use *ad hoc* criteria to filter features; `subset()` is a base
+*R* function.
 
 ```{r}
-hallmarks <- training_hallmarks()
-hallmarks
-
-## gene sets and their counts
-hallmarks |> dplyr::count(set) |> DT::datatable()
-```
-
-Suppose we are interested in the `HALLMARK_P53_PATHWAY` gene set
-
-```{r}
-p53_gene_set <-
-    hallmarks |>
-    filter(set == "HALLMARK_P53_PATHWAY")
-nrow(p53_gene_set)
-```
-
-We can create a subset of our data with just these genes (some
-identifiers in `p53_gene_set` are not present in our observed data...)
-
-```{r}
-p53_rows <- rownames(h5ad) %in% pull(p53_gene_set, "gene")
-h5ad_p53 <- h5ad[p53_rows,]
-h5ad_p53
-```
-
-It is then easy to visualize the UMAP of this subset of genes, or
-perform addditional analyses.
-
-```{r}
-## UMAP coordinate. N.B., this is taking a subset of the UMAP
-## coordinates computed on all genes, not re-calculating a UMAP on the
-## P53 gene set.
-umap_p53 <-
-    as_tibble(reducedDim(h5ad_p53, "X_umap")) |>
-    bind_cols(
-        cell_type = h5ad_p53$cell_type,
-        donor_id = h5ad_p53$donor_id,
-        self_reported_ethnicity = h5ad_p53$self_reported_ethnicity,
-        colname = colnames(h5ad_p53) # unique identifier
-    )
-
-plot_ly(
-    umap_p53,
-    x = ~ V1, y =  ~ V2, color = ~ cell_type,
-    type = "scatter", mode = "markers", opacity = .5,
-    marker = list(symbol = "circle-open", line = list(width = 1))
+pbmc <- subset(
+    pbmc,
+    subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5
 )
+
+pbmc
 ```
 
-[MSigDB]: https://www.gsea-msigdb.org/gsea/msigdb/
+The workflow continues from here...
+
+# _Bioconductor_
+
+The following is based on [Orchestrating Single-Cell Analysis with
+Bioconductor][OSCA]. This resource is separated into introductory,
+basic, advanced, and multi-sample sections, with a collection of
+workflows illustrating use. A good place to start is with a workflow
+to get a feel for data analysis, and then to refer back to earlier
+sections for more detailed operations or understanding.
+
+We'll follow the [Unfiltered human PBMCs][] workflow for another PBMC
+data, but use the same dataset as in the Seurat section earlier in
+this article.
+
+[OSCA]: http://bioconductor.org/books/release/OSCA.basic/
+[Unfiltered human PBMCs]: https://bioconductor.org/books/release/OSCA.workflows/unfiltered-human-pbmcs-10x-genomics.html
+
+## Workflow
+
+Data retrieval is a outlined above. After `untar()`ing the data
+`pbmc3k_data_dir` is the location to use for data input.
+
+```{r, message = FALSE}
+library(DropletUtils)
+library(scuttle)
+```
+
+```{r}
+pbmc3k <- read10xCounts(pbmc3k_data_dir, col.names = TRUE)
+
+pbmc3k
+```
+
+The data as input requires some massaging
+
+```{r}
+rownames(pbmc3k) <-
+    uniquifyFeatureNames(rowData(pbmc3k)$ID, rowData(pbmc3k)$Symbol)
+```
+
+The workflow continues with a step to detect empty drops. The
+algorithm is partially stochastic, so `set.seed()` ensures
+reproducibility.
+
+```{r}
+## set.seed(100)
+## e.out <- emptyDrops(pbmc3k)
+```
+
+
+# Brief Commentary
+
+[Getting Started with Seurat]: https://satijalab.org/seurat
+[Seurat tutorial]: https://satijalab.org/seurat/articles/pbmc3k_tutorial.html
