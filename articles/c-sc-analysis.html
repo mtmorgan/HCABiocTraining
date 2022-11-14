@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">HCABiocTraining</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.10</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.11</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -248,21 +248,96 @@ input.</p>
 <span><span class="co">## reducedDimNames(0):</span></span>
 <span><span class="co">## mainExpName: NULL</span></span>
 <span><span class="co">## altExpNames(0):</span></span></code></pre></div>
-<p>The data as input requires some massaging</p>
+<p>Skipping to the quality control step, let’s identify mitochondrial
+genes. In this data set, we can identify the mitochondrial genes by
+looking at the <code>Symbol</code> column of <code><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData()</a></code></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">pbmc3k</span><span class="op">)</span> <span class="op">&lt;-</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/scuttle/man/uniquifyFeatureNames.html" class="external-link">uniquifyFeatureNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">pbmc3k</span><span class="op">)</span><span class="op">$</span><span class="va">ID</span>, <span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">pbmc3k</span><span class="op">)</span><span class="op">$</span><span class="va">Symbol</span><span class="op">)</span></span></code></pre></div>
-<p>The workflow continues with a step to detect empty drops. The
-algorithm is partially stochastic, so <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> ensures
-reproducibility.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">pbmc3k</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/startsWith.html" class="external-link">startsWith</a></span><span class="op">(</span><span class="va">Symbol</span>, <span class="st">"MT-"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">## <span style="color: #949494;"># A tibble: 13 × 2</span></span></span>
+<span><span class="co">##    ID              Symbol </span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> ENSG00000198888 MT-ND1 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> ENSG00000198763 MT-ND2 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> ENSG00000198804 MT-CO1 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> ENSG00000198712 MT-CO2 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> ENSG00000228253 MT-ATP8</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> ENSG00000198899 MT-ATP6</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> ENSG00000198938 MT-CO3 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> ENSG00000198840 MT-ND3 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> ENSG00000212907 MT-ND4L</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> ENSG00000198886 MT-ND4 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">11</span> ENSG00000198786 MT-ND5 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">12</span> ENSG00000198695 MT-ND6 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">13</span> ENSG00000198727 MT-CYB</span></span>
+<span></span>
+<span><span class="va">is_mitochondrial</span> <span class="op">&lt;-</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData</a></span><span class="op">(</span><span class="va">pbmc3k</span><span class="op">)</span><span class="op">$</span><span class="va">Symbol</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/startsWith.html" class="external-link">startsWith</a></span><span class="op">(</span><span class="st">"MT-"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>Calculate per-cell quality control metrics…</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## set.seed(100)</span></span>
-<span><span class="co">## e.out &lt;- emptyDrops(pbmc3k)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">stats</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scuttle/man/perCellQCMetrics.html" class="external-link">perCellQCMetrics</a></span><span class="op">(</span><span class="va">pbmc3k</span>, subsets<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Mito<span class="op">=</span><span class="va">is_mitochondrial</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">stats</span> <span class="op">|&gt;</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">## <span style="color: #949494;"># A tibble: 2,700 × 6</span></span></span>
+<span><span class="co">##      sum detected subsets_Mito_sum subsets_Mito_detected subsets_Mito_pe…¹ total</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>  <span style="text-decoration: underline;">2</span>421      781               73                    10             3.02   <span style="text-decoration: underline;">2</span>421</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>  <span style="text-decoration: underline;">4</span>903     <span style="text-decoration: underline;">1</span>352              186                    10             3.79   <span style="text-decoration: underline;">4</span>903</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>  <span style="text-decoration: underline;">3</span>149     <span style="text-decoration: underline;">1</span>131               28                     8             0.889  <span style="text-decoration: underline;">3</span>149</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>  <span style="text-decoration: underline;">2</span>639      960               46                    10             1.74   <span style="text-decoration: underline;">2</span>639</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   981      522               12                     5             1.22    981</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>  <span style="text-decoration: underline;">2</span>164      782               36                     7             1.66   <span style="text-decoration: underline;">2</span>164</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>  <span style="text-decoration: underline;">2</span>176      783               83                    10             3.81   <span style="text-decoration: underline;">2</span>176</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>  <span style="text-decoration: underline;">2</span>260      790               70                     9             3.10   <span style="text-decoration: underline;">2</span>260</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>276      533               15                     6             1.18   <span style="text-decoration: underline;">1</span>276</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">1</span>103      550               32                     7             2.90   <span style="text-decoration: underline;">1</span>103</span></span>
+<span><span class="co">## <span style="color: #949494;"># … with 2,690 more rows, and abbreviated variable name ¹​subsets_Mito_percent</span></span></span>
+<span></span>
+<span><span class="va">high_mito</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/scuttle/man/isOutlier.html" class="external-link">isOutlier</a></span><span class="op">(</span><span class="va">stats</span><span class="op">$</span><span class="va">subsets_Mito_percent</span>, type<span class="op">=</span><span class="st">"higher"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">high_mito</span><span class="op">)</span></span>
+<span><span class="co">## high_mito</span></span>
+<span><span class="co">## FALSE  TRUE </span></span>
+<span><span class="co">##  2607    93</span></span></code></pre></div>
+<p>…and use <code>high_mito</code> to create a subset of the results</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pbmc3k</span><span class="op">[</span>, <span class="op">!</span><span class="va">high_mito</span><span class="op">]</span></span>
+<span><span class="co">## class: SingleCellExperiment </span></span>
+<span><span class="co">## dim: 32738 2607 </span></span>
+<span><span class="co">## metadata(1): Samples</span></span>
+<span><span class="co">## assays(1): counts</span></span>
+<span><span class="co">## rownames(32738): ENSG00000243485 ENSG00000237613 ... ENSG00000215616</span></span>
+<span><span class="co">##   ENSG00000215611</span></span>
+<span><span class="co">## rowData names(2): ID Symbol</span></span>
+<span><span class="co">## colnames(2607): AAACATACAACCAC-1 AAACATTGAGCTAC-1 ... TTTGCATGAGAGGC-1</span></span>
+<span><span class="co">##   TTTGCATGCCTCAC-1</span></span>
+<span><span class="co">## colData names(2): Sample Barcode</span></span>
+<span><span class="co">## reducedDimNames(0):</span></span>
+<span><span class="co">## mainExpName: NULL</span></span>
+<span><span class="co">## altExpNames(0):</span></span></code></pre></div>
+<p>The workflow continues…!</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="brief-commentary">Brief Commentary<a class="anchor" aria-label="anchor" href="#brief-commentary"></a>
 </h2>
+<p>It is worthwhile to compare the <em>Seurat</em> and
+<em>SingleCellExperiment</em> work flows.</p>
+<p>Actually, a first question is ‘why not just have a single function
+that takes the analysis from begining to end?’ Answers might be</p>
+<ol style="list-style-type: decimal">
+<li><p>It is educational to understand the data transformations and
+their assummptions required in an analysis.</p></li>
+<li><p>No two data sets are the same, so at any step some manipulation
+(e.g., to identify mitochondrial genes), choice of algorithm, or
+interpretation of results might be required.</p></li>
+</ol>
+<p>What about the difference between the <em>Seurat</em> and
+<em>Bioconductor</em> workflows? In broad detail the analyses accomplish
+the same ends. <em>Seurat</em> is more standardized and widely used,
+while <em>Bioconductor</em> may beless standardized and more
+flexible.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
