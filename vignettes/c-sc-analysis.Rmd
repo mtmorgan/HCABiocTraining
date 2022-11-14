@@ -169,24 +169,59 @@ pbmc3k <- read10xCounts(pbmc3k_data_dir, col.names = TRUE)
 pbmc3k
 ```
 
-The data as input requires some massaging
+Skipping to the quality control step, let's identify mitochondrial
+genes. In this data set, we can identify the mitochondrial genes by
+looking at the `Symbol` column of `rowData()`
 
 ```{r}
-rownames(pbmc3k) <-
-    uniquifyFeatureNames(rowData(pbmc3k)$ID, rowData(pbmc3k)$Symbol)
+rowData(pbmc3k) |>
+    dplyr::as_tibble() |>
+    dplyr::filter(startsWith(Symbol, "MT-"))
+
+is_mitochondrial <-
+    rowData(pbmc3k)$Symbol |>
+    startsWith("MT-") |>
+    which()
 ```
 
-The workflow continues with a step to detect empty drops. The
-algorithm is partially stochastic, so `set.seed()` ensures
-reproducibility.
+Calculate per-cell quality control metrics...
 
 ```{r}
-## set.seed(100)
-## e.out <- emptyDrops(pbmc3k)
+stats <- perCellQCMetrics(pbmc3k, subsets=list(Mito=is_mitochondrial))
+stats |> dplyr::as_tibble()
+
+high_mito <- isOutlier(stats$subsets_Mito_percent, type="higher")
+table(high_mito)
 ```
 
+...and use `high_mito` to create a subset of the results
+
+```{r}
+pbmc3k[, !high_mito]
+```
+
+The workflow continues...!
 
 # Brief Commentary
+
+It is worthwhile to compare the *Seurat* and *SingleCellExperiment*
+work flows.
+
+Actually, a first question is 'why not just have a single function
+that takes the analysis from begining to end?' Answers might be
+
+1. It is educational to understand the data transformations and their
+   assummptions required in an analysis.
+
+2. No two data sets are the same, so at any step some manipulation
+   (e.g., to identify mitochondrial genes), choice of algorithm, or
+   interpretation of results might be required.
+   
+What about the difference between the *Seurat* and *Bioconductor*
+workflows? In broad detail the analyses accomplish the same
+ends. *Seurat* is more standardized and widely used, while
+*Bioconductor* may beless standardized and more flexible.
+
 
 [Getting Started with Seurat]: https://satijalab.org/seurat
 [Seurat tutorial]: https://satijalab.org/seurat/articles/pbmc3k_tutorial.html
