@@ -16,9 +16,11 @@ objects. Direct manipulation can be important for both routine (e.g.,
 creating a subset of data based on gene set membership) or advanced
 (e.g., implementing a new analysis method) tasks. The focus is on
 _Bioconductor_'s `SingleCellExperiment` object becuase of the rich
-supporting infastructure (e.g., annotation resources) within
-_Bioconductor_; similar operations can also be accomplished with the
-Seurat object.
+supporting infastructure (e.g., annotation resources or the powerful
+[GenomicRanges][] infrastructure) within _Bioconductor_; similar
+operations can also be accomplished with the Seurat object.
+
+[GenomicRanges]: https://bioconductor.org/packages/GenomicRanges
 
 We start by loading packages we'll use today.
 
@@ -259,28 +261,7 @@ h5ad_p53 <- h5ad[p53_rows,]
 h5ad_p53
 ```
 
-It is then easy to visualize the UMAP of this subset of genes, or
-perform addditional analyses.
-
-```{r}
-## UMAP coordinate. N.B., this is taking a subset of the UMAP
-## coordinates computed on all genes, not re-calculating a UMAP on the
-## P53 gene set.
-umap_p53 <-
-    as_tibble(reducedDim(h5ad_p53, "X_umap")) |>
-    bind_cols(
-        cell_type = h5ad_p53$cell_type,
-        donor_id = h5ad_p53$donor_id,
-        self_reported_ethnicity = h5ad_p53$self_reported_ethnicity,
-        colname = colnames(h5ad_p53) # unique identifier
-    )
-
-plot_ly(
-    umap_p53,
-    x = ~ V1, y =  ~ V2, color = ~ cell_type,
-    type = "scatter", mode = "markers", opacity = .8,
-    marker = list(symbol = "circle-open", line = list(width = 1))
-)
-```
+These steps illustrate some of the straight-forward ways of
+integrating scRNASeq analysis into larger bioinformatic work flows.
 
 [MSigDB]: https://www.gsea-msigdb.org/gsea/msigdb/

@@ -32,3 +32,24 @@ training_read_h5ad_as_sce <-
         reducedDims = h5ad$obsm,
     )
 }
+
+#' @rdname training_read_h5ad
+#'
+#' @export
+training_read_h5ad_as_seurat <-
+    function(h5ad_file_path)
+{
+    h5ad <- read_h5ad(h5ad_file_path)
+    seurat <- Seurat::CreateSeuratObject(
+        counts = Matrix::t(h5ad$X),
+        meta.data = h5ad$obs
+    )
+
+    ## h5ad_reductions <- names(h5ad$obsm)
+    ## seurat_reductions <- sub("X_", "", h5ad_reductions)
+    ## for (i in seq_along(h5ad_reductions))
+    ##     seurat[[seurat_reductions[[i]]]] <-
+    ##         h5ad$obsm[[h5ad_reductions[[i]]]]
+
+    seurat
+}

@@ -231,7 +231,8 @@ the helper function `training_read_h5ad_as_sce()` to load the data
 h5ad <- training_read_h5ad_as_sce(h5ad_file)
 ```
 
-Displaying the object...
+The approach uses the [anndata][] *R* package and
+[anndata][anndata-python] module.  Displaying the object...
 
 ```{r}
 h5ad
@@ -243,9 +244,19 @@ counts `assays(h5ad, "counts")`, annotations on each gene
 (`rowData()`) and cell (`colData()`), etc...
 
 Working with `SingleCellExperiment` objects is described in additional
-detail in the next article.
+detail subsequent articles.
 
 ## *Seurat*
 
+The [Seurat][] package represents data as a `Seurat` object. Normally,
+a `Seurat` object can be created using [SeuratDisk][], but this
+currently does not handle the `.h5ad` file format made available by
+CELLxGENE. The helper function `training_read_h5ad_as_seurat()`
+sketches an approach to data import using the [anndata][] *R* package
+and [anndata][anndata-python] module.
+
 [SingleCellExperiment]: https://bioconductor.org/packages/SingleCellExperiment
 [Seurat]: https://satijalab.org/seurat/
+[SeuratDisk]: https://mojaveazure.github.io/seurat-disk/index.html
+[anndata]: https://cran.r-project.org/package=anndata
+[anndata-python]: https://anndata.readthedocs.io/en/latest/index.html
