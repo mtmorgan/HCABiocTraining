@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">HCABiocTraining</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.9</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -122,7 +122,7 @@ e.g., 32 GB RAM, 8 CPU for some steps.</p></li>
 <li>‘Matrix Market’ sparse matrix files, e.g., tuples of &lt;row,
 column, count&gt; for non-zero values.</li>
 <li>HDF5, e.g., <a href="https://linnarssonlab.org/loompy/format/index.html" class="external-link">.loom</a> or
-<code>.h5ad</code> (<a href="https://anndata.readthedocs.io/en/latest/index.html" class="external-link">anndata</a>).</li>
+<code>.h5ad</code> (<a href="https://cran.r-project.org/package=anndata" class="external-link">anndata</a>).</li>
 </ul>
 </li>
 <li>
@@ -355,7 +355,9 @@ it will likely be fixed in a timely manner. Instead, we use the helper
 function <code><a href="../reference/training_read_h5ad.html">training_read_h5ad_as_sce()</a></code> to load the data</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">h5ad</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/training_read_h5ad.html">training_read_h5ad_as_sce</a></span><span class="op">(</span><span class="va">h5ad_file</span><span class="op">)</span></span></code></pre></div>
-<p>Displaying the object…</p>
+<p>The approach uses the <a href="https://cran.r-project.org/package=anndata" class="external-link">anndata</a> <em>R</em>
+package and <a href="https://anndata.readthedocs.io/en/latest/index.html" class="external-link">anndata</a>
+module. Displaying the object…</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">h5ad</span></span>
 <span><span class="co">## class: SingleCellExperiment </span></span>
@@ -378,12 +380,21 @@ function <code><a href="../reference/training_read_h5ad.html">training_read_h5ad
 counts <code>assays(h5ad, "counts")</code>, annotations on each gene
 (<code><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData()</a></code>) and cell (<code><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData()</a></code>), etc…</p>
 <p>Working with <code>SingleCellExperiment</code> objects is described
-in additional detail in the next article.</p>
+in additional detail subsequent articles.</p>
 </div>
 <div class="section level3">
 <h3 id="seurat">
 <em>Seurat</em><a class="anchor" aria-label="anchor" href="#seurat"></a>
 </h3>
+<p>The <a href="https://satijalab.org/seurat/" class="external-link">Seurat</a> package
+represents data as a <code>Seurat</code> object. Normally, a
+<code>Seurat</code> object can be created using <a href="https://mojaveazure.github.io/seurat-disk/index.html" class="external-link">SeuratDisk</a>,
+but this currently does not handle the <code>.h5ad</code> file format
+made available by CELLxGENE. The helper function
+<code><a href="../reference/training_read_h5ad.html">training_read_h5ad_as_seurat()</a></code> sketches an approach to data
+import using the <a href="https://cran.r-project.org/package=anndata" class="external-link">anndata</a> <em>R</em>
+package and <a href="https://anndata.readthedocs.io/en/latest/index.html" class="external-link">anndata</a>
+module.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

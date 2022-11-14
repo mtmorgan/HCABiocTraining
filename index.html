@@ -30,7 +30,7 @@
     
     <a class="navbar-brand me-2" href="index.html">HCABiocTraining</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.9</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,16 +75,29 @@
 <div class="page-header"><h1 id="hcabioctraining">HCABiocTraining<a class="anchor" aria-label="anchor" href="#hcabioctraining"></a>
 </h1></div>
 <!-- badges: start -->
-<!-- badges: end -->
+
 <p>HCABiocTraining is an introduction to Human Cell Atlas data retrieval and analysis in <em>R</em> / <em><a href="https://bioconductor.org" class="external-link">Bioconductor</a></em>. The focus is on single-cell RNA-seq data. A wide range of material is covered, from basic <em>R</em> to advanced data analysis steps outlined in ‘Orchestrating Single-Cell Analysis with Bioconductor’ (<a href="https://bioconductor.org/books/OSCA" class="external-link">OSCA</a>). The treatment is very superficial, but the hope is that it unlocks opportunities for reproducible, sophisticated analysis.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
+<p>This resource includes</p>
+<ul>
+<li>A web site <a href="https://mtmorgan.github.io/HCABiocTraining" class="uri">https://mtmorgan.github.io/HCABiocTraining</a>.</li>
+<li>An ‘Orchestra’ resource for interactive computation.</li>
+<li>
+<code>ghcr.io/mtmorgan/hcabioctraining</code>, a pre-build docker image.</li>
+<li>The source code for this package at <a href="https://github.com/mtmorgan/HCABiocTraining" class="external-link uri">https://github.com/mtmorgan/HCABiocTraining</a>.</li>
+</ul>
 <p>Install necessary software from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="st">"BiocManager"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html" class="external-link">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, repos <span class="op">=</span> <span class="st">"https://cran.r-project.org"</span><span class="op">)</span></span>
-<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"mtmorgan/HCABiocTraining"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"mtmorgan/HCABiocTraining"</span>, dependencies <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>The software makes use of the <a href="https://anndata.readthedocs.io/en/latest/index.html" class="external-link">anndata</a> Python module through the <em>R</em> package <a href="https://cran.r-project.org/package=reticulate" class="external-link">reticulate</a>. Install <em>anndata</em> following <em>reticulate</em> best practices, e.g., by creating and using a virtual environment.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rstudio.github.io/reticulate/" class="external-link">reticulate</a></span><span class="op">)</span></span>
+<span><span class="fu">reticulate</span><span class="fu">::</span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/virtualenv-tools.html" class="external-link">virtualenv_create</a></span><span class="op">(</span><span class="st">'HCABiocTraining'</span>, packages <span class="op">=</span> <span class="st">'anndata'</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/use_python.html" class="external-link">use_virtualenv</a></span><span class="op">(</span><span class="st">'HCABiocTraining'</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="articles">Articles<a class="anchor" aria-label="anchor" href="#articles"></a>
@@ -93,8 +106,9 @@
 <ol style="list-style-type: decimal">
 <li><p>Introduction to <em>R</em>. Scripting, core functions, and contributed packages.</p></li>
 <li><p>HCA Data Access. Using the <a href="https://bioconductor.org/packages/hca" class="external-link">hca</a> and <a href="https://bioconductor.org/packages/cellxgenedp" class="external-link">cellxgenedp</a> packages for data retrieval.</p></li>
+<li><p>Single Cell Sequence Analysis. Explores the <a href="https://satijalab.org/seurat/" class="external-link">Seurat</a> and <a href="https://bioconductor.org/packages/SingleCellExperiment" class="external-link">SingleCellExperiment</a> frameworks for well-established single cell analysis work flows.</p></li>
 <li><p><em>R</em> and <em>Bioconductor</em> Analysis of Single-Cell Expression Data. Introduction to key resources available for analysis of single-cell expression data. <a href="https://satijalab.org/seurat/" class="external-link">Seurat</a>. The <a href="https://bioconductor.org/packages/SingleCellExperiment" class="external-link">SingleCellExperiment</a> and ‘Orchestrating Single-Cell Analysis with Bioconductor’ (<a href="https://bioconductor.org/books/OSCA" class="external-link">OSCA</a>)</p></li>
-<li><p>Prospects for spatial and extended analysis.</p></li>
+<li><p>Prospects for multimodal, spatial and extended analysis.</p></li>
 </ol>
 </div>
 </div>
@@ -121,7 +135,12 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/mtmorgan/HCABiocTraining/actions/workflows/basic_checks.yaml" class="external-link"><img src="https://github.com/mtmorgan/HCABiocTraining/actions/workflows/basic_checks.yaml/badge.svg" alt="Check, build, and push image"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>
