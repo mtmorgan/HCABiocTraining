@@ -51,6 +51,8 @@ Count matrix
   - 'Matrix Market' sparse matrix files, e.g., tuples of <row, column,
     count> for non-zero values.
   - HDF5, e.g., [.loom][] or `.h5ad` ([anndata][]).
+  - RDS -- An *R* file, in *CELLxGENE* these are *Seurat* objects but
+    in general they could contain any *R* object.
 
 - Representation in _R_
 
@@ -66,7 +68,8 @@ Counts & annotations
 - HDF5 file formats coordinate row and column annotations with count
   data.
 - *R* software tries to offer a coordinated representation of counts
-  and metadata, e.g., *Bioconductor*'s [SingleCellExperiment][].
+  and metadata, e.g., the [Seurat][] or *Bioconductor*
+  [SingleCellExperiment][] objects.
 
 [anndata]: https://anndata.readthedocs.io/en/latest/index.html
 [.loom]: https://linnarssonlab.org/loompy/format/index.html
@@ -103,11 +106,11 @@ What's available?
 - Collections and datasets contributed by the single-cell community,
   with some overlap with data sets in the HCA Data Portal.
 - FASTQ files
-- `.h5ad`-summarized count data and cell metadata, as well as
-  reduced-dimension (e.g., UMAP) representations
-- Summarized count files provided by the contributor / individual lab,
-  so of uncertain provenance
-- Easy to download count matrix, e.g., in `.h5ad` (anndata) format
+- `.h5ad` or `.RDS` summarized count data and cell metadata, as well
+  as reduced-dimension (e.g., UMAP) representations
+  - Summarized count files provided by the contributor / individual
+    lab, so of uncertain provenance
+- Easy to download count data
 - Easy to visualize (!)
 
 ![](images/CXGViz.png)
@@ -121,7 +124,8 @@ Why use an *R* script when the Data Portals exist?
 
 - Easily reproducible
 - Flexible exploration of rich & complex data
-- Direct integration with _Bioconductor_ single-cell workflows
+- Direct integration with *Seurat* or *Bioconductor* single-cell
+  workflows
 
 ## Human Cell Atlas
 
@@ -134,9 +138,11 @@ Why use an *R* script when the Data Portals exist?
 [A-HCA]: https://mtmorgan.github.io/ExploringHCACxG/articles/A_HCA.html
 [hcaCaseStudies]: https://mtmorgan.github.io/hcaCaseStudies
 
-## CellXGene
+## CELLxGENE
 
 Load the [cellxgenedp][] package
+
+[cellxgenedp]: https://bioconductor.org/packages/cellxgenedp
 
 ```{r}
 library(cellxgenedp)
@@ -179,7 +185,6 @@ selected_files |>
     dplyr::filter(filetype == "CXG") |>
     dplyr::slice(1) |>
     pull(dataset_id)
-## "de985818-285f-4f59-9dbd-d74968fddba3"
 ```
 
 ... and set it; the helper function `training_cxg_dataset()` provides
@@ -271,8 +276,8 @@ The approach uses the [anndata][] *R* package and
 h5ad
 ```
 
-...suggests the data available and how to access it -- there are `r
-nrow(h5ad)` genes and `r ncol(h5ad)` cells. The 'raw' data include
+...suggests the data available and how to access it -- there are
+`r nrow(h5ad)` genes and `r ncol(h5ad)` cells. The 'raw' data include
 counts `assays(h5ad, "counts")`, annotations on each gene
 (`rowData()`) and cell (`colData()`), etc...
 
@@ -284,5 +289,4 @@ detail subsequent articles.
 [SeuratDisk]: https://mojaveazure.github.io/seurat-disk/index.html
 [SeuratDisk-workflow]: https://mojaveazure.github.io/seurat-disk/articles/convert-anndata.html#converting-from-anndata-to-seurat-via-h5seuratbut this
 
-[anndata]: https://cran.r-project.org/package=anndata
 [anndata-python]: https://anndata.readthedocs.io/en/latest/index.html

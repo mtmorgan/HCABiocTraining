@@ -40,7 +40,7 @@ best practices, e.g., by creating and using a virtual environment.
 ``` r
 library(reticulate)
 reticulate::virtualenv_create('HCABiocTraining', packages = 'anndata')
-use_virtualenv('HCABiocTraining')
+reticulate::use_virtualenv('HCABiocTraining')
 ```
 
 [anndata]: https://anndata.readthedocs.io/en/latest/index.html
@@ -48,7 +48,7 @@ use_virtualenv('HCABiocTraining')
 
 ## Articles
 
-The articles in this repository cover four main topics
+The articles in this repository cover the following topics
 
 1. Introduction to _R_. Scripting, core functions, and contributed
    packages.
@@ -62,9 +62,13 @@ The articles in this repository cover four main topics
    / *Bioconductor* 'Orchestrating Single-Cell Analysis with
    Bioconductor' ([OSCA][]).
 
-4. Integrating single cell data into _R_ and _Bioconductor_ workflows.
+4. Integrating single cell data into *Seurat* and *Bioconductor*
+   workflows.
 
 5. Prospects for multimodal, spatial and extended analysis.
+
+Most of our time will be spent on HCA data access and integration of
+single cell data into *Seurat* and *Bioconductor* workflows.
 
 [Bioconductor]: https://bioconductor.org
 [hca]: https://bioconductor.org/packages/hca

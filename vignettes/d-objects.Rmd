@@ -146,12 +146,14 @@ accessible and summarized as
 ```{r}
 colData(h5ad) |>
     as_tibble()
-
+```
+```{r}
 colData(h5ad) |>
     as_tibble() |>
     group_by(donor_id, self_reported_ethnicity) |>
     dplyr::count()
-
+```
+```{r}
 colData(h5ad) |>
     as_tibble() |>
     dplyr::count(cell_type, sort = TRUE)
@@ -170,7 +172,7 @@ scater::plotReducedDim(h5ad, "X_umap", color_by = "cell_type")
 
 # Outside the Box
 
-This section using the *SingleCellExperiment*; similar operations can
+This section uses the *SingleCellExperiment*; similar operations can
 be performed on *Seurat* objects.
 
 It very easy to find out information about the samples included in the
