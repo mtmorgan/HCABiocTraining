@@ -49,6 +49,11 @@ df <- data.frame(
 df
 ```
 
+Key opererations on `data.frame`
+
+- `df[1:3, c("gender", "age")]` -- subset on rows and columns
+- `df[["age"]]`, `df$age` -- select columns
+
 Functions
 
 ```{r}
@@ -108,7 +113,9 @@ system.time({
 })
 ```
 
-...or contributed, e.g., [dplyr][] to introduce the 'tidyverse'
+## Tidyverse
+
+The [dplyr][] package introduces the 'tidyverse'
 
 ```{r, message = FALSE}
 library(dplyr)
@@ -126,11 +133,15 @@ tbl <- tibble(
 tbl
 ```
 
-The tidyverse makes use of 'pipes' `|>`. A pipe takes the left-hand
-side and pass through to the right-hand side. Key [dplyr][] 'verbs'
-can be piped together: `filter()` (rows), `select()` (columns),
-`mutate()` (change values), `group_by()` (operate on groups of rows)
+The tidyverse makes use of 'pipes' `|>` (the older syntax is `%>%`). A
+pipe takes the left-hand side and pass through to the right-hand
+side. Key [dplyr][] 'verbs' can be piped together
 
+- `filter()` rows
+- `select()` columns
+- `mutate()` to change values
+- `group_by()` operate on groups of rows
+- `left_join()` (and friends) for joining tibbles based on shared columns
 
 ```{r}
 tbl |>
@@ -140,8 +151,9 @@ tbl |>
     mutate(distance_from_origin = sqrt(x^2 + y^2))
 ```
 
+## Visualization
 
-Another example: [ggplot2][] for visualization
+Another example of a contributed package is [ggplot2][] for visualization
 
 ```{r}
 library(ggplot2)

@@ -1,8 +1,8 @@
 ---
-title: "D. Working Directly with Data"
+title: "D. Using Single-Cell Data into Bioconductor Work Flows"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{D. Working Directly with Data}
+  %\VignetteIndexEntry{D. Using Single-Cell Data into Bioconductor Work Flows}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

@@ -11,18 +11,49 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-```{r setup}
-library(HCABiocTraining)
-```
-
 # Directions
 
-## Spatial Transcriptomics
+This article serves as pointer to additional resources for spatial and
+other data types in the *Bioconductor* and *Seurat* communities.
 
-[Orchestrating Spatially-Resolved Transcriptomics Analysis with Bioconductor][OSTA]
+## Bioconductor
+
+In *Bioconductor* a good starting resource is [Orchestrating
+Spatially-Resolved Transcriptomics Analysis with
+Bioconductor][OSTA]. Check out `biocViews` (e.g., the [spatial][]
+term) and new packages in the most recent [release][]. A key feature
+of *Bioconductor* packages is the vignette, so be sure to review
+vignettes of any package that seems interesting. Follow [guidelines][]
+(it's not as intimidating as it seems!) to contribute your own
+methods.
 
 [OSTA]: https://lmweber.org/OSTA-book/
+[biocViews]: https://bioconductor.org/packages/release/BiocViews.html#___Software
+[spatial]: https://bioconductor.org/packages/release/BiocViews.html#___Spatial
+[release]: https://bioconductor.org/news/bioc_3_16_release/
+[guidelines]: https://contributions.bioconductor.org
 
-## Image Analysis
+## Seurat
 
-# Seurat, Bioconductor, AnnData, ...
+The *Seurat* community has links from the [Getting Started][] page to
+resources for multi-modal and spatial transcriptomic
+analysis. *Seurat* provides a [wrappers][] for enabling
+(re)-distribution packages in a way that encourages use in the
+*Seurat* community.
+
+[Getting Started]: https://satijalab.org/seurat/articles/get_started.html
+[wrappers]: https://satijalab.org/seurat/articles/get_started.html#seuratwrappers
+
+## Python
+
+[scanpy][] and [anndata][] represent key *Python* resources. For *R*
+users wishing to integrate Python steps into an overall analysis a
+reasonable strategy is to use the [reticulate][] package to invoke
+*Python* from *R*; the [anndata][anndata-R] *R* package provides a
+convenient wrapper around anndata in *Python* and we used this in the
+`training_read_h5ad_as_*()` functions.
+
+[scanpy]: https://scanpy.readthedocs.io/en/latest/index.html
+[anndata]: https://anndata.readthedocs.io/en/latest/
+[reticulate]: https://cran.r-project.org/package=reticulate
+[anndata-R]: https://cran.r-project.org/package=anndata

@@ -55,13 +55,12 @@ The articles in this repository cover four main topics
 
 3. Single Cell Sequence Analysis. Explores the [Seurat][] and
    [SingleCellExperiment][] frameworks for well-established single
-   cell analysis work flows.
+   cell analysis work flows such as the *Seurat* documentation and *R*
+   / *Bioconductor* 'Orchestrating Single-Cell Analysis with
+   Bioconductor' ([OSCA][]).
 
-4. _R_ and _Bioconductor_ Analysis of Single-Cell Expression
-   Data. Introduction to key resources available for analysis of
-   single-cell expression data. [Seurat][]. The
-   [SingleCellExperiment][] and 'Orchestrating Single-Cell Analysis
-   with Bioconductor' ([OSCA][])
+4. Integrating single cell data into _R_ and _Bioconductor_ workflows
+
 
 5. Prospects for multimodal, spatial and extended analysis.
 

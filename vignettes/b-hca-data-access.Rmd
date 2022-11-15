@@ -249,14 +249,25 @@ detail subsequent articles.
 ## *Seurat*
 
 The [Seurat][] package represents data as a `Seurat` object. Normally,
-a `Seurat` object can be created using [SeuratDisk][], but this
-currently does not handle the `.h5ad` file format made available by
-CELLxGENE. The helper function `training_read_h5ad_as_seurat()`
-sketches an approach to data import using the [anndata][] *R* package
-and [anndata][anndata-python] module.
+a `Seurat` object can be created using [SeuratDisk][] using this
+[workflow][SeuratDisk-workflow]
+
+```{r, eval = FALSE}
+h5seurat_file <- sub(".h5ad$", "h5seurat", h5ad_file)
+Convert(h5ad_file, dest = "h5seurat", overwrite = TRUE)
+h5seurat <- LoadH5Seurat(h5seurat_file)
+```
+
+Unfortunately this does not currently handle the `.h5ad` file format
+made available by CELLxGENE. The helper function
+`training_read_h5ad_as_seurat()` sketches an approach to data import
+using the [anndata][] *R* package and [anndata][anndata-python]
+module.
 
 [SingleCellExperiment]: https://bioconductor.org/packages/SingleCellExperiment
 [Seurat]: https://satijalab.org/seurat/
 [SeuratDisk]: https://mojaveazure.github.io/seurat-disk/index.html
+[SeuratDisk-workflow]: https://mojaveazure.github.io/seurat-disk/articles/convert-anndata.html#converting-from-anndata-to-seurat-via-h5seuratbut this
+
 [anndata]: https://cran.r-project.org/package=anndata
 [anndata-python]: https://anndata.readthedocs.io/en/latest/index.html
