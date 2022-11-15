@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">HCABiocTraining</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.14</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -121,7 +121,10 @@ e.g., 32 GB RAM, 8 CPU for some steps.</p></li>
 <li>‘Matrix Market’ sparse matrix files, e.g., tuples of &lt;row,
 column, count&gt; for non-zero values.</li>
 <li>HDF5, e.g., <a href="https://linnarssonlab.org/loompy/format/index.html" class="external-link">.loom</a> or
-<code>.h5ad</code> (<a href="https://cran.r-project.org/package=anndata" class="external-link">anndata</a>).</li>
+<code>.h5ad</code> (<a href="https://anndata.readthedocs.io/en/latest/index.html" class="external-link">anndata</a>).</li>
+<li>RDS – An <em>R</em> file, in <em>CELLxGENE</em> these are
+<em>Seurat</em> objects but in general they could contain any <em>R</em>
+object.</li>
 </ul>
 </li>
 <li>
@@ -143,7 +146,9 @@ separately.</li>
 data.</li>
 <li>
 <em>R</em> software tries to offer a coordinated representation of
-counts and metadata, e.g., <em>Bioconductor</em>’s <a href="https://bioconductor.org/packages/SingleCellExperiment" class="external-link">SingleCellExperiment</a>.</li>
+counts and metadata, e.g., the <a href="https://satijalab.org/seurat/" class="external-link">Seurat</a> or <em>Bioconductor</em>
+<a href="https://bioconductor.org/packages/SingleCellExperiment" class="external-link">SingleCellExperiment</a>
+objects.</li>
 </ul>
 </div>
 <div class="section level2">
@@ -180,12 +185,14 @@ Portal</a></p>
 with some overlap with data sets in the HCA Data Portal.</li>
 <li>FASTQ files</li>
 <li>
-<code>.h5ad</code>-summarized count data and cell metadata, as well
-as reduced-dimension (e.g., UMAP) representations</li>
+<code>.h5ad</code> or <code>.RDS</code> summarized count data and
+cell metadata, as well as reduced-dimension (e.g., UMAP) representations
+<ul>
 <li>Summarized count files provided by the contributor / individual lab,
 so of uncertain provenance</li>
-<li>Easy to download count matrix, e.g., in <code>.h5ad</code> (anndata)
-format</li>
+</ul>
+</li>
+<li>Easy to download count data</li>
 <li>Easy to visualize (!)</li>
 </ul>
 <p><img src="images/CXGViz.png"></p>
@@ -198,8 +205,8 @@ format</li>
 <ul>
 <li>Easily reproducible</li>
 <li>Flexible exploration of rich &amp; complex data</li>
-<li>Direct integration with <em>Bioconductor</em> single-cell
-workflows</li>
+<li>Direct integration with <em>Seurat</em> or <em>Bioconductor</em>
+single-cell workflows</li>
 </ul>
 <div class="section level3">
 <h3 id="human-cell-atlas-1">Human Cell Atlas<a class="anchor" aria-label="anchor" href="#human-cell-atlas-1"></a>
@@ -213,9 +220,10 @@ examples of processing CSV and Matrix Market files.</p></li>
 </ul>
 </div>
 <div class="section level3">
-<h3 id="cellxgene-1">CellXGene<a class="anchor" aria-label="anchor" href="#cellxgene-1"></a>
+<h3 id="cellxgene-1">CELLxGENE<a class="anchor" aria-label="anchor" href="#cellxgene-1"></a>
 </h3>
-<p>Load the [cellxgenedp][] package</p>
+<p>Load the <a href="https://bioconductor.org/packages/cellxgenedp" class="external-link">cellxgenedp</a>
+package</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">cellxgenedp</span><span class="op">)</span></span></code></pre></div>
 <p>Retrieve the current database, and use ‘tidy’ functionality to mimic
@@ -283,8 +291,7 @@ reproducibility we retrieve the dataset id…</p>
 <span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">filetype</span> <span class="op">==</span> <span class="st">"CXG"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">dataset_id</span><span class="op">)</span></span>
-<span><span class="co">## [1] "de985818-285f-4f59-9dbd-d74968fddba3"</span></span>
-<span><span class="co">## "de985818-285f-4f59-9dbd-d74968fddba3"</span></span></code></pre></div>
+<span><span class="co">## [1] "de985818-285f-4f59-9dbd-d74968fddba3"</span></span></code></pre></div>
 <p>… and set it; the helper function <code><a href="../reference/training_cxg_dataset.html">training_cxg_dataset()</a></code>
 provides a summary of this dataset.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -367,8 +374,8 @@ using this <a href="https://mojaveazure.github.io/seurat-disk/articles/convert-a
 <p>Unfortunately this does not currently handle the <code>.h5ad</code>
 file format made available by CELLxGENE. The helper function
 <code><a href="../reference/training_read_h5ad.html">training_read_h5ad_as_seurat()</a></code> sketches an approach to data
-import using the <a href="https://cran.r-project.org/package=anndata" class="external-link">anndata</a> <em>R</em>
-package and <a href="https://anndata.readthedocs.io/en/latest/index.html" class="external-link">anndata</a>
+import using the <a href="https://anndata.readthedocs.io/en/latest/index.html" class="external-link">anndata</a>
+<em>R</em> package and <a href="https://anndata.readthedocs.io/en/latest/index.html" class="external-link">anndata</a>
 module.</p>
 </div>
 <div class="section level3">
@@ -389,8 +396,8 @@ it will likely be fixed in a timely manner. Instead, we use the helper
 function <code><a href="../reference/training_read_h5ad.html">training_read_h5ad_as_sce()</a></code> to load the data</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">h5ad</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/training_read_h5ad.html">training_read_h5ad_as_sce</a></span><span class="op">(</span><span class="va">h5ad_file</span><span class="op">)</span></span></code></pre></div>
-<p>The approach uses the <a href="https://cran.r-project.org/package=anndata" class="external-link">anndata</a> <em>R</em>
-package and <a href="https://anndata.readthedocs.io/en/latest/index.html" class="external-link">anndata</a>
+<p>The approach uses the <a href="https://anndata.readthedocs.io/en/latest/index.html" class="external-link">anndata</a>
+<em>R</em> package and <a href="https://anndata.readthedocs.io/en/latest/index.html" class="external-link">anndata</a>
 module. Displaying the object…</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">h5ad</span></span>
@@ -409,9 +416,9 @@ module. Displaying the object…</p>
 <span><span class="co">## reducedDimNames(3): X_pca X_tsne X_umap</span></span>
 <span><span class="co">## mainExpName: NULL</span></span>
 <span><span class="co">## altExpNames(0):</span></span></code></pre></div>
-<p>…suggests the data available and how to access it – there are
-<code>r nrow(h5ad)</code> genes and 31696 cells. The ‘raw’ data include
-counts <code>assays(h5ad, "counts")</code>, annotations on each gene
+<p>…suggests the data available and how to access it – there are 33234
+genes and 31696 cells. The ‘raw’ data include counts
+<code>assays(h5ad, "counts")</code>, annotations on each gene
 (<code><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">rowData()</a></code>) and cell (<code><a href="https://rdrr.io/pkg/SummarizedExperiment/man/SummarizedExperiment-class.html" class="external-link">colData()</a></code>), etc…</p>
 <p>Working with <code>SingleCellExperiment</code> objects is described
 in additional detail subsequent articles.</p>
