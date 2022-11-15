@@ -388,9 +388,14 @@ in additional detail subsequent articles.</p>
 </h3>
 <p>The <a href="https://satijalab.org/seurat/" class="external-link">Seurat</a> package
 represents data as a <code>Seurat</code> object. Normally, a
-<code>Seurat</code> object can be created using <a href="https://mojaveazure.github.io/seurat-disk/index.html" class="external-link">SeuratDisk</a>,
-but this currently does not handle the <code>.h5ad</code> file format
-made available by CELLxGENE. The helper function
+<code>Seurat</code> object can be created using <a href="https://mojaveazure.github.io/seurat-disk/index.html" class="external-link">SeuratDisk</a>
+using this <a href="https://mojaveazure.github.io/seurat-disk/articles/convert-anndata.html#converting-from-anndata-to-seurat-via-h5seuratbut%20this" class="external-link">workflow</a></p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">h5seurat_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">".h5ad$"</span>, <span class="st">"h5seurat"</span>, <span class="va">h5ad_file</span><span class="op">)</span></span>
+<span><span class="fu">Convert</span><span class="op">(</span><span class="va">h5ad_file</span>, dest <span class="op">=</span> <span class="st">"h5seurat"</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">h5seurat</span> <span class="op">&lt;-</span> <span class="fu">LoadH5Seurat</span><span class="op">(</span><span class="va">h5seurat_file</span><span class="op">)</span></span></code></pre></div>
+<p>Unfortunately this does not currently handle the <code>.h5ad</code>
+file format made available by CELLxGENE. The helper function
 <code><a href="../reference/training_read_h5ad.html">training_read_h5ad_as_seurat()</a></code> sketches an approach to data
 import using the <a href="https://cran.r-project.org/package=anndata" class="external-link">anndata</a> <em>R</em>
 package and <a href="https://anndata.readthedocs.io/en/latest/index.html" class="external-link">anndata</a>
