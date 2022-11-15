@@ -28,10 +28,7 @@ or on a research network like the [AnVIL][] computational cloud.
 
 [AnVIL]: https://anvilproject.org
 
-```{r setup, message = FALSE}
-```
-
-# _Seurat_
+# Seurat
 
 Based on [Getting Started with Seurat][] and the [Seurat - Guided
 Clustering Tutorial][Seurat tutorial]. The guided tutorial covers
@@ -137,7 +134,7 @@ pbmc
 
 The workflow continues from here...
 
-# _Bioconductor_
+# Bioconductor
 
 The following is based on [Orchestrating Single-Cell Analysis with
 Bioconductor][OSCA]. This resource is separated into introductory,

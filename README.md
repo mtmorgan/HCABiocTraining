@@ -16,11 +16,14 @@ reproducible, sophisticated analysis.
 
 This resource includes
 
+- An '[Orchestra][]' resource for interactive computation.
+- `ghcr.io/mtmorgan/hcabioctraining`, a pre-build docker image
+  containing all necessary resources (R and Python packages, RStudio,
+  etc)
 - A web site https://mtmorgan.github.io/HCABiocTraining.
-- An 'Orchestra' resource for interactive computation.
-- `ghcr.io/mtmorgan/hcabioctraining`, a pre-build docker image.
-- The source code for this package at
-  https://github.com/mtmorgan/HCABiocTraining.
+- The source code https://github.com/mtmorgan/HCABiocTraining.
+
+[Orchestra]: http://app.orchestra.cancerdatasci.org/1
 
 Install necessary software from [GitHub](https://github.com/) with:
 
@@ -59,8 +62,7 @@ The articles in this repository cover four main topics
    / *Bioconductor* 'Orchestrating Single-Cell Analysis with
    Bioconductor' ([OSCA][]).
 
-4. Integrating single cell data into _R_ and _Bioconductor_ workflows
-
+4. Integrating single cell data into _R_ and _Bioconductor_ workflows.
 
 5. Prospects for multimodal, spatial and extended analysis.
 
@@ -70,3 +72,24 @@ The articles in this repository cover four main topics
 [Seurat]: https://satijalab.org/seurat/
 [SingleCellExperiment]: https://bioconductor.org/packages/SingleCellExperiment
 [OSCA]: https://bioconductor.org/books/OSCA
+
+## Docker Image
+
+To make use of the docker image (after the workshop) pull it
+
+```
+docker pull ghcr.io/mtmorgan/hcabioctraining:latest
+```
+
+and run it using `-p` to connect the local port '8787' to the port
+where RStudio is, and `-v` to mount your local system folder
+`working_directory` to the docker image
+
+```
+docker run -it --rm \
+    -p 8787:8787 \
+    -v /your/file/path/working_directory:/home/rstudio/working_directory
+```
+
+RStudio should be available in your browser at
+`https://localhost:8787` or `https://127.0.0.1:8787`

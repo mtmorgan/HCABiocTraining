@@ -11,14 +11,18 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-This article explores more direct manipulation of single cell
-objects. Direct manipulation can be important for both routine (e.g.,
-creating a subset of data based on gene set membership) or advanced
-(e.g., implementing a new analysis method) tasks. The focus is on
-_Bioconductor_'s `SingleCellExperiment` object becuase of the rich
-supporting infastructure (e.g., annotation resources or the powerful
-[GenomicRanges][] infrastructure) within _Bioconductor_; similar
-operations can also be accomplished with the Seurat object.
+This article explores more direct manipulation of single cell objects
+and their integration into *Seurat*, *R* and *Bioconductor* work
+flows. We illustrate the basics of object manipulation provided by
+existing packages, and then hint at how one might start to work with
+data 'outside the box' provided by these packages.  This can be
+important for both routine (e.g., creating a subset of data based on
+gene set membership) or advanced (e.g., implementing a new analysis
+method) tasks. The focus is on _Bioconductor_'s `SingleCellExperiment`
+object becuase of the rich supporting infastructure (e.g., annotation
+resources or the powerful [GenomicRanges][] infrastructure) within
+_Bioconductor_; similar operations can also be accomplished with the
+Seurat object.
 
 [GenomicRanges]: https://bioconductor.org/packages/GenomicRanges
 
@@ -27,11 +31,12 @@ We start by loading packages we'll use today.
 ```{r setup, message = FALSE}
 library(HCABiocTraining)
 
+## single cell data representation in R
+library(Seurat)               # Seurat representation
+library(SingleCellExperiment) # Bioconductor representation
+
 ## data access
 library(cellxgenedp)
-
-## single cell data representation in R
-library(SingleCellExperiment) # Bioconductor representation
 
 ## general programming tools
 library(dplyr)
@@ -39,10 +44,23 @@ library(ggplot2)
 library(plotly)
 ```
 
-# Data retrieval
+We illustrate these steps with data from CELLxGENE retrieved in the
+previous article. For our own data we would need to proceed from a
+simple count matrix produced by Cell Ranger (etc.) through careful
+quality control, normalization, data integration / batch coorrection,
+etc., as illustrated in a different article.
 
-The following is an abbreviated version of the steps illustrated in
-the previous article.
+# Exploring Objects
+
+## Seurat
+
+Based on [Getting Started with Seurat][] and the [Seurat - Guided
+Clustering Tutorial][Seurat tutorial]. 
+
+[Getting Started with Seurat]: https://satijalab.org/seurat
+[Seurat tutorial]: https://satijalab.org/seurat/articles/pbmc3k_tutorial.html
+
+Retrieve the Seurat object
 
 ```{r}
 ## use a known dataset ID, discovered previously..
@@ -50,6 +68,46 @@ dataset <- "de985818-285f-4f59-9dbd-d74968fddba3"
 training_cxg_dataset(dataset)
 
 ## download (or retieve from the local cache) the file
+seurat_file <-
+    files() |>
+    dplyr::filter(filetype == "RDS", dataset_id == dataset) |>
+    files_download(dry.run = FALSE)
+
+seurat <- readRDS(seurat_file)
+```
+
+Retrieve the annotation on each cell using `[[]]`, e.g.,
+
+```{r}
+seurat[[]] |>
+    as_tibble() |>
+    dplyr::count(self_reported_ethnicity)
+
+seurat[[]] |>
+    as_tibble() |>
+    dplyr::count(cell_type)
+```
+
+Recreate a simple UMAP
+
+```{r}
+UMAPPlot(seurat, group.by = "cell_type")
+```
+
+I remove the `seurat` object from the session, in hopes of freeing up
+a bit of memory.
+
+```{r}
+rm(seurat)
+```
+
+## SingleCellExperiment
+
+Retreive the `.h5ad` file
+
+```{r}
+## download (or retieve from the local cache) the file
+dataset <- "de985818-285f-4f59-9dbd-d74968fddba3"
 h5ad_file <-
     files() |>
     dplyr::filter(filetype == "H5AD", dataset_id == dataset) |>
@@ -59,15 +117,16 @@ h5ad_file <-
 h5ad <- training_read_h5ad_as_sce(h5ad_file)
 ```
 
-# Exploring Pre-computed Data
-
-We illustrate these steps with data from CELLxGENE retrieved in the
-previous article. For our own data we would need to proceed from a
-simple count matrix produced by Cell Ranger (etc.) through careful
-quality control, normalization, data integration / batch coorrection,
-etc., as illustrated in a subsequent section.
-
 ## Basic Manipulation
+
+The following is based on [Orchestrating Single-Cell Analysis with
+Bioconductor][OSCA]. This resource is separated into introductory,
+basic, advanced, and multi-sample sections, with a collection of
+workflows illustrating use. A good place to start is with a workflow
+to get a feel for data analysis, and then to refer back to earlier
+sections for more detailed operations or understanding.
+
+[OSCA]: http://bioconductor.org/books/release/OSCA.basic/
 
 Displaying the `SingleCellExperiment`...
 
@@ -109,8 +168,28 @@ scater::plotReducedDim(h5ad, "X_umap", color_by = "cell_type")
 
 [scater]: https://bioconductor.org/packages/scater
 
-One can also work with the data more directly, e.g., to plot the
-distribution of reads per cell...
+# Outside the Box
+
+This section using the *SingleCellExperiment*; similar operations can
+be performed on *Seurat* objects.
+
+It very easy to find out information about the samples included in the
+study, e.g., the individual donors, their ethnicty, and family history
+of breast cancer (the specific information available depends on the
+data submitted by the original investigator).
+
+```{r}
+colData(h5ad) |>
+    as_tibble() |>
+    dplyr::count(
+        donor_id, self_reported_ethnicity, family_history_breast_cancer
+    )
+```
+
+
+The actual feature x sample counts are available and easily
+manipulated, as illustrated by this plot of the distribution of reads
+per cell...
 
 ```{r}
 reads_per_cell <-
@@ -136,29 +215,13 @@ table(reads_per_gene != 0)
 h5ad[reads_per_gene != 0,]
 ```
 
-It's also very easy to find out information about the samples included
-in the study, e.g., the individual donors, their ethnicty, and family
-history of breast cancer (the specific information available depends
-on the data submitted by the original investigator).
-
-```{r}
-SingleCellExperiment::colData(h5ad) |>
-    as_tibble() |>
-    dplyr::count(
-        donor_id, self_reported_ethnicity, family_history_breast_cancer
-    )
-```
-
-Glancing at this table, we see that there is little replication that
-does not have serious confounding factors.
-
 ## Visualization
 
 The previous section created a static visualization from the 'UMAP'
 reduced dimension representation using `scater::plotReducedDim()`:
 
 It can be helpful to do this 'by hand' to illustrate how one can work
-directly with SingleCellExperiment objects. First load [ggplot2][]
+directly with *SingleCellExperiment* objects. First load [ggplot2][]
 
 [ggplot2]: https://cran.r-project.org/package=ggplot2
 
@@ -240,7 +303,7 @@ hallmarks <- training_hallmarks()
 hallmarks
 
 ## gene sets and their counts
-hallmarks |> dplyr::count(set) |> DT::datatable()
+hallmarks |> dplyr::count(set)
 ```
 
 Suppose we are interested in the `HALLMARK_P53_PATHWAY` gene set

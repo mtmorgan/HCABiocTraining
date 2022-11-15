@@ -19,7 +19,6 @@ library(HCABiocTraining)
 
 ## general programming tools
 library(dplyr)
-library(ggplot2)
 
 ## data access
 library(hca)
@@ -199,10 +198,15 @@ selected_files |>
     datasets_visualize()
 ```
 
-...or select the 'H5AD' file associated with the dataset and download
-it for subsequent processing in _R_
+...or select the 'H5AD' or 'RDS' (Seurat) file associated with the
+dataset and download it for subsequent processing in _R_
 
 ```{r}
+seurat_file <-
+    selected_files |>
+    dplyr::filter(filetype == "RDS", dataset_id == dataset) |>
+    files_download(dry.run = FALSE)
+
 h5ad_file <-
     selected_files |>
     dplyr::filter(filetype == "H5AD", dataset_id == dataset) |>
@@ -212,6 +216,35 @@ h5ad_file <-
 The downloaded file is cached, so the next time access is fast.
 
 # Representation in *R*
+
+## *Seurat*
+
+Fortunately, CELLxGENE distributes Seurat (v. 4) files, and they can
+be input directly.
+
+```{r}
+library(Seurat)
+seurat <- readRDS(seurat_file)
+seurat
+```
+
+We will work with this object a little in a subsequent article.
+
+The `.h5ad` files from CELLxGENE can also be used to construct a
+`Seurat` object. Normally, a `Seurat` object can be created using
+[SeuratDisk][] using this [workflow][SeuratDisk-workflow]
+
+```{r, eval = FALSE}
+h5seurat_file <- sub(".h5ad$", "h5seurat", h5ad_file)
+Convert(h5ad_file, dest = "h5seurat", overwrite = TRUE)
+h5seurat <- LoadH5Seurat(h5seurat_file)
+```
+
+Unfortunately this does not currently handle the `.h5ad` file format
+made available by CELLxGENE. The helper function
+`training_read_h5ad_as_seurat()` sketches an approach to data import
+using the [anndata][] *R* package and [anndata][anndata-python]
+module.
 
 ## *SingleCellExperiment*
 
@@ -245,24 +278,6 @@ counts `assays(h5ad, "counts")`, annotations on each gene
 
 Working with `SingleCellExperiment` objects is described in additional
 detail subsequent articles.
-
-## *Seurat*
-
-The [Seurat][] package represents data as a `Seurat` object. Normally,
-a `Seurat` object can be created using [SeuratDisk][] using this
-[workflow][SeuratDisk-workflow]
-
-```{r, eval = FALSE}
-h5seurat_file <- sub(".h5ad$", "h5seurat", h5ad_file)
-Convert(h5ad_file, dest = "h5seurat", overwrite = TRUE)
-h5seurat <- LoadH5Seurat(h5seurat_file)
-```
-
-Unfortunately this does not currently handle the `.h5ad` file format
-made available by CELLxGENE. The helper function
-`training_read_h5ad_as_seurat()` sketches an approach to data import
-using the [anndata][] *R* package and [anndata][anndata-python]
-module.
 
 [SingleCellExperiment]: https://bioconductor.org/packages/SingleCellExperiment
 [Seurat]: https://satijalab.org/seurat/
