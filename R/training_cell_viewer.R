@@ -21,7 +21,7 @@
     )
 }
 
-#' @importFrom plotly renderPlotly plot_ly event_data layout
+#' @importFrom plotly renderPlotly plot_ly toWebGL event_data layout
 #'
 #' @importFrom shiny observeEvent stopApp
 #'
@@ -41,7 +41,7 @@
                 x = ~ V1, y = ~ V2, color = ~ get(input$color),
                 type = 'scatter', mode = 'markers', opacity = .5,
                 customdata = ~ colname
-            ) |> layout(dragmode = "select")
+            ) |> layout(dragmode = "select") |> toWebGL()
         })
 
         observeEvent(input$done, {

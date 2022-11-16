@@ -236,7 +236,7 @@ cell (column) annotations
 
 ```{r}
 umap <-
-    as_tibble(reducedDim(h5ad, "X_umap")) |>
+    as_tibble(SingleCellExperiment::reducedDim(h5ad, "X_umap")) |>
     bind_cols(
         cell_type = h5ad$cell_type,
         donor_id = h5ad$donor_id,
@@ -266,7 +266,7 @@ plot_ly(
     x = ~ V1, y =  ~ V2, color = ~ cell_type,
     type = "scatter", mode = "markers", opacity = .8,
     marker = list(symbol = "circle-open", line = list(width = 1))
-)
+) |> toWebGL() # using webGL greatly speeds display!
 ```
 
 A suprisingly straight-forward (but admittedly advanced) helper

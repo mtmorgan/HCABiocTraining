@@ -23,13 +23,18 @@ training_read_h5ad_as_sce <-
     h5ad <- read_h5ad(h5ad_file_path)
     SingleCellExperiment(
         assays = list(
+            ## data in 'X' is normalized counts (provided by the
+            ## author) because there is a '/raw/X' entry, c.f.,
+            ## https://cellxgene.cziscience.com/docs/032__Contribute%20and%20Publish%20Data
+            ## and rhdf5::h5ls(h5ad_file_path) |> as_tibble() |>
+            ## filter(grepl("X", group))
             counts = Matrix::t(h5ad$X)
             ## too much memory for github actions
             ## logcounts = log1p(Matrix::t(h5ad$X))
         ),
         colData = h5ad$obs, rowData = h5ad$var,
         metadata = h5ad$uns,
-        reducedDims = h5ad$obsm,
+        reducedDims = h5ad$obsm
     )
 }
 
