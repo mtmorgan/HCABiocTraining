@@ -14,7 +14,7 @@
 #' @importFrom cellxgenedp db datasets collections
 #'
 #' @examples
-#' dataset <- "de985818-285f-4f59-9dbd-d74968fddba3"
+#' dataset <- "24205601-0780-4bf2-b1d9-0e3cacbc2cd6"
 #' ds <- training_cxg_dataset(dataset)
 #' ds
 #'

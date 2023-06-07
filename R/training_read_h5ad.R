@@ -28,7 +28,8 @@ training_read_h5ad_as_sce <-
             ## https://cellxgene.cziscience.com/docs/032__Contribute%20and%20Publish%20Data
             ## and rhdf5::h5ls(h5ad_file_path) |> as_tibble() |>
             ## filter(grepl("X", group))
-            counts = Matrix::t(h5ad$X)
+            counts = Matrix::t(h5ad$X),
+            raw_counts = Matrix::t(h5ad$raw$X)
             ## too much memory for github actions
             ## logcounts = log1p(Matrix::t(h5ad$X))
         ),

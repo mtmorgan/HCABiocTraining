@@ -63,8 +63,8 @@ Clustering Tutorial][Seurat tutorial].
 Retrieve the Seurat object
 
 ```{r}
-## use a known dataset ID, discovered previously..
-dataset <- "de985818-285f-4f59-9dbd-d74968fddba3"
+## use a known dataset ID, discovered previously
+dataset <- "24205601-0780-4bf2-b1d9-0e3cacbc2cd6"
 training_cxg_dataset(dataset)
 
 ## download (or retieve from the local cache) the file
@@ -107,14 +107,14 @@ Retreive the `.h5ad` file
 
 ```{r}
 ## download (or retieve from the local cache) the file
-dataset <- "de985818-285f-4f59-9dbd-d74968fddba3"
+dataset <- "24205601-0780-4bf2-b1d9-0e3cacbc2cd6"
 h5ad_file <-
     files() |>
     dplyr::filter(filetype == "H5AD", dataset_id == dataset) |>
     files_download(dry.run = FALSE)
 
 ## import into R as a SingleCellExperiment
-h5ad <- training_read_h5ad_as_sce(h5ad_file)
+h5ad <-zellkonverter::readH5AD(h5ad_file, reader = "R")
 ```
 
 ## Basic Manipulation
@@ -147,13 +147,13 @@ accessible and summarized as
 colData(h5ad) |>
     as_tibble()
 ```
-```{r}
+```{r, eval = FALSE}
 colData(h5ad) |>
     as_tibble() |>
     group_by(donor_id, self_reported_ethnicity) |>
     dplyr::count()
 ```
-```{r}
+```{r, eval = FALSE}
 colData(h5ad) |>
     as_tibble() |>
     dplyr::count(cell_type, sort = TRUE)
@@ -197,7 +197,7 @@ per cell...
 reads_per_cell <-
     h5ad |>
     ## retrieve the matrix of gene x cell counts
-    assay("counts", withDimnames = FALSE) |>
+    assay(withDimnames = FALSE) |>
     ## calculate the column sums, i.e., reads mapped to each cell
     colSums()
 
@@ -209,7 +209,7 @@ hist(log10(reads_per_cell))
 ```{r}
 reads_per_gene <-
     h5ad |>
-    assay("counts", withDimnames = FALSE) |>
+    assay(withDimnames = FALSE) |>
     rowSums()
 
 table(reads_per_gene != 0)

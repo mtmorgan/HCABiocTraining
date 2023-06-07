@@ -150,7 +150,7 @@ library(cellxgenedp)
 
 Retrieve the current database, and use 'tidy' functionality to mimic
 the graphical selection in the web browser -- 10x 3' v3 (EFO:0009922)
-assay, Affrican American ethnicity, female gender)
+assay, African American ethnicity, female gender)
 
 ```{r}
 db <- db()
@@ -164,13 +164,41 @@ african_american_female <-
 african_american_female
 ```
 
+A particular collection is
+
+```{r}
+collection_id <- "c9706a92-0e5f-46c1-96d8-20e42467f287"
+african_american_female |>
+    filter(collection_id %in% .env$collection_id)
+```
+
+The dataset associated with this collection is
+
+```{r}
+dataset <-
+    african_american_female |>
+    filter(collection_id %in% .env$collection_id) |>
+    select(dataset_id)
+dataset_id <-
+    dataset |>
+    pull(dataset_id)
+dataset_id
+```
+
+The helper function `training_cxg_dataset()` provides
+a summary of this dataset.
+
+```{r}
+training_cxg_dataset(dataset_id)
+```
+
 'Join' selected datasets and files to identify the files associated
 with these datasets.
 
 ```{r}
 selected_files <-
     left_join(
-        african_american_female |> select(dataset_id),
+        dataset,
         files(db),
         by = "dataset_id"
     )
@@ -182,24 +210,14 @@ reproducibility we retrieve the dataset id...
 
 ```{r}
 selected_files |>
-    dplyr::filter(filetype == "CXG") |>
-    dplyr::slice(1) |>
-    pull(dataset_id)
-```
-
-... and set it; the helper function `training_cxg_dataset()` provides
-a summary of this dataset.
-
-```{r}
-dataset <- "de985818-285f-4f59-9dbd-d74968fddba3"
-training_cxg_dataset(dataset)
+    dplyr::filter(filetype == "CXG")
 ```
 
 Visualize this 'CXG' file in the browser...
 
 ```{r}
 selected_files |>
-    dplyr::filter(filetype == "CXG", dataset_id == dataset) |>
+    dplyr::filter(filetype == "CXG", dataset_id %in% .env$dataset_id) |>
     datasets_visualize()
 ```
 
@@ -209,12 +227,12 @@ dataset and download it for subsequent processing in _R_
 ```{r}
 seurat_file <-
     selected_files |>
-    dplyr::filter(filetype == "RDS", dataset_id == dataset) |>
+    dplyr::filter(filetype == "RDS", dataset_id %in% .env$dataset_id) |>
     files_download(dry.run = FALSE)
 
 h5ad_file <-
     selected_files |>
-    dplyr::filter(filetype == "H5AD", dataset_id == dataset) |>
+    dplyr::filter(filetype == "H5AD", dataset_id == .env$dataset_id) |>
     files_download(dry.run = FALSE)
 ```
 
@@ -259,18 +277,14 @@ a gene x cell count matricies (`assay()`) with annotations on the
 genes (`rowData()`) and columns (`cellData()`), and with
 reduced-dimension summaries.
 
-Usually, an effective way to represent the `.h5ad` data as a
-`SingleCellExperiment` is using `zellkonverter::readH5AD()`. Recent
-updates to the `.h5ad` file format have unfortunately broken that
-function; it will likely be fixed in a timely manner. Instead, we use
-the helper function `training_read_h5ad_as_sce()` to load the data
+An effective way to represent the `.h5ad` data as a
+`SingleCellExperiment` is using `zellkonverter::readH5AD()`.
 
 ```{r}
-h5ad <- training_read_h5ad_as_sce(h5ad_file)
+h5ad <- zellkonverter::readH5AD(h5ad_file, reader = "R", use_hdf5 = TRUE)
 ```
 
-The approach uses the [anndata][] *R* package and
-[anndata][anndata-python] module.  Displaying the object...
+Displaying the object...
 
 ```{r}
 h5ad
